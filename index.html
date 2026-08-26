@@ -214,7 +214,7 @@ function extractBib(text) {
    TANPA PINDAH HALAMAN
 ========================= */
 
-async function processCheckin(bib) {
+function processCheckin(bib) {
 
   if (!bib || locked) return;
 
@@ -222,80 +222,104 @@ async function processCheckin(bib) {
 
   show(
     "QR TERBACA: <b>" + bib + "</b><br>" +
-    "Sedang memproses check-in...",
+    "Membuka sistem check-in...",
     "ok"
   );
 
   if (scanner) {
-
-    try {
-      await scanner.stop();
-    } catch(e) {}
-
+    scanner.stop().catch(() => {});
     scanner = null;
   }
 
-
-  /*
-   Kirim request ke Apps Script
-   TANPA membuka halaman Apps Script.
-  */
+  // Kirim BIB langsung ke Apps Script
+  // melalui navigasi HTTPS.
+  // Apps Script akan melakukan check-in
+  // kemudian mengembalikan pengguna ke GitHub.
 
   const url =
-    APP_URL + "?bib=" + encodeURIComponent(bib);
+    APP_URL +
+    "?bib=" +
+    encodeURIComponent(bib);
+
+  window.location.href = url;
+}
+
+/* =========================
+   HASIL DARI APPS SCRIPT
+========================= */
+
+(function handleResult() {
+
+  const params =
+    new URLSearchParams(window.location.search);
+
+  const status =
+    params.get('status');
+
+  const bib =
+    params.get('bib');
+
+  const message =
+    params.get('message');
 
 
-  try {
-
-    await fetch(url, {
-      method: "GET",
-      mode: "no-cors",
-      cache: "no-store"
-    });
+  if (!status || !bib) {
+    return;
+  }
 
 
-    /*
-     no-cors memang tidak memberikan
-     isi response kepada browser.
-
-     Tetapi request tetap dikirim ke
-     Apps Script sehingga Apps Script
-     dapat melakukan update Google Sheet.
-    */
+  if (status === 'SUCCESS') {
 
     show(
       "<b>✓ CHECK-IN BERHASIL</b><br><br>" +
       "BIB: <b>" + bib + "</b><br>" +
-      "Data sudah dikirim ke sistem Hino Fun Run.",
+      "Data sudah masuk ke Google Sheet.",
       "ok"
     );
 
+  }
 
-  } catch (error) {
+  else if (status === 'DUPLICATE') {
 
     show(
-      "<b>GAGAL MENGIRIM CHECK-IN</b><br>" +
-      "Periksa koneksi internet lalu coba lagi.<br><br>" +
+      "<b>⚠ PESERTA SUDAH CHECK-IN</b><br><br>" +
+      "BIB: <b>" + bib + "</b>",
+      "warn"
+    );
+
+  }
+
+  else if (status === 'NOT_FOUND') {
+
+    show(
+      "<b>✕ BIB TIDAK DITEMUKAN</b><br><br>" +
       "BIB: <b>" + bib + "</b>",
       "err"
     );
 
   }
 
+  else {
 
-  /*
-   Buka kembali scanner setelah beberapa detik
-  */
+    show(
+      "<b>✕ CHECK-IN GAGAL</b><br><br>" +
+      "BIB: <b>" + bib + "</b><br>" +
+      (message || "Terjadi kesalahan."),
+      "err"
+    );
 
-  setTimeout(() => {
-
-    locked = false;
-
-  }, 2500);
-
-}
+  }
 
 
+  // Bersihkan parameter URL
+  window.history.replaceState(
+    {},
+    document.title,
+    window.location.pathname
+  );
+
+})();
+  
 /* =========================
    START CAMERA
 ========================= */
