@@ -187,28 +187,21 @@ function show(msg, cls="result") {
 ========================= */
 
 function extractBib(text) {
-
   text = String(text || "").trim();
 
-  /*
-   Bisa membaca:
+  // Membaca QR dengan format:
+  // ?b=M26005
+  // atau:
+  // ?bib=M26005
 
-   M26001
-
-   atau
-
-   https://.....?bib=M26001
-  */
-
-  const m = text.match(
-    /(?:[?&]bib=)([A-Za-z0-9_-]+)/i
-  );
+  const m = text.match(/(?:[?&](?:b|bib)=)([A-Za-z0-9_-]+)/i);
 
   if (m) {
     return m[1].toUpperCase();
   }
 
-  if (/^[MF]\d{5}$/i.test(text)) {
+  // Jika QR langsung berisi nomor BIB
+  if (/^[A-Z]\d{5}$/i.test(text)) {
     return text.toUpperCase();
   }
 
