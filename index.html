@@ -381,43 +381,43 @@
      JSONP
   ========================= */
 
-  function loadStats() {
+  function statsCallback(data) {
+  console.log("STATISTICS:", data);
 
-  const callbackName =
-    "statsCallback_" + Date.now();
-
-  window[callbackName] = function(data) {
-
-    console.log("STATISTICS:", data);
-
+  if (data && data.ok) {
     updateStats(data);
 
-    delete window[callbackName];
+    document.getElementById("refreshInfo").textContent =
+      "Statistik diperbarui.";
+  } else {
+    document.getElementById("refreshInfo").textContent =
+      "Data statistik tidak valid.";
+  }
+}
 
-    const script =
-      document.getElementById(callbackName);
+function loadStats() {
 
-    if (script) {
-      script.remove();
-    }
-  };
+  const oldScript =
+    document.getElementById("statsScript");
+
+  if (oldScript) {
+    oldScript.remove();
+  }
 
   const script =
     document.createElement("script");
 
-  script.id = callbackName;
+  script.id = "statsScript";
 
   script.src =
     STATS_URL +
-    "&callback=" +
-    callbackName +
-    "&t=" +
+    "&callback=statsCallback&t=" +
     Date.now();
 
   script.onerror = function() {
 
     console.error(
-      "Gagal mengambil statistik dari:",
+      "Gagal memuat statistik:",
       script.src
     );
 
@@ -425,10 +425,6 @@
       "refreshInfo"
     ).textContent =
       "Gagal memuat statistik.";
-
-    delete window[callbackName];
-
-    script.remove();
   };
 
   document.body.appendChild(script);
