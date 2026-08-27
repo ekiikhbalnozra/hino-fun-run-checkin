@@ -4,12 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#e30613">
-  <title>Hino Fun Run 2026 - QR Check-in</title>
+
+  <title>Hino Fun Run 2026 - Check-in</title>
 
   <script src="https://unpkg.com/html5-qrcode" defer></script>
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -37,9 +40,66 @@
     }
 
     .sub {
-      color:#6b7280;
-      margin-bottom:16px;
+      color: #6b7280;
+      margin-bottom: 16px;
     }
+
+    /* =========================
+       STATISTIK
+    ========================= */
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .stat {
+      padding: 12px 6px;
+      border-radius: 12px;
+      text-align: center;
+      background: #f3f4f6;
+    }
+
+    .stat-number {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .stat-label {
+      margin-top: 5px;
+      font-size: 11px;
+      color: #6b7280;
+      font-weight: 700;
+    }
+
+    .stat.total {
+      background: #e5e7eb;
+    }
+
+    .stat.hadir {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .stat.belum {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .refresh-info {
+      text-align: center;
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: -8px;
+      margin-bottom: 14px;
+    }
+
+    /* =========================
+       SCANNER
+    ========================= */
 
     #reader {
       width: 100%;
@@ -62,52 +122,57 @@
     }
 
     button.secondary {
-      background:#4b5563;
+      background: #4b5563;
     }
 
     .result {
       margin-top: 16px;
       padding: 15px;
       border-radius: 12px;
-      background:#eef2f7;
-      line-height:1.55;
+      background: #eef2f7;
+      line-height: 1.55;
     }
 
     .ok {
-      background:#dcfce7;
-      color:#166534;
+      background: #dcfce7;
+      color: #166534;
     }
 
     .warn {
-      background:#fef3c7;
-      color:#92400e;
+      background: #fef3c7;
+      color: #92400e;
     }
 
     .err {
-      background:#fee2e2;
-      color:#991b1b;
+      background: #fee2e2;
+      color: #991b1b;
     }
 
     .manual {
-      margin-top:18px;
-      padding-top:16px;
-      border-top:1px solid #e5e7eb;
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid #e5e7eb;
     }
 
     input {
-      width:100%;
-      padding:14px;
-      border:1px solid #d1d5db;
-      border-radius:10px;
-      font-size:17px;
-      text-transform:uppercase;
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 17px;
+      text-transform: uppercase;
+      margin-top: 8px;
     }
 
     small {
-      color:#6b7280;
-      display:block;
-      margin-top:10px;
-      line-height:1.4;
+      color: #6b7280;
+      display: block;
+      margin-top: 10px;
+      line-height: 1.4;
+    }
+
+    .loading {
+      opacity: .6;
     }
   </style>
 </head>
@@ -115,6 +180,7 @@
 <body>
 
 <div class="wrap">
+
   <div class="card">
 
     <h1>Hino Fun Run 2026</h1>
@@ -123,16 +189,73 @@
       CHECK-IN PESERTA — QR SCANNER
     </div>
 
+
+    <!-- =========================
+         STATISTIK PESERTA
+    ========================== -->
+
+    <div class="stats">
+
+      <div class="stat total">
+        <div class="stat-number" id="totalPeserta">
+          -
+        </div>
+
+        <div class="stat-label">
+          TOTAL PESERTA
+        </div>
+      </div>
+
+
+      <div class="stat hadir">
+        <div class="stat-number" id="totalHadir">
+          -
+        </div>
+
+        <div class="stat-label">
+          SUDAH CHECK-IN
+        </div>
+      </div>
+
+
+      <div class="stat belum">
+        <div class="stat-number" id="totalBelum">
+          -
+        </div>
+
+        <div class="stat-label">
+          BELUM CHECK-IN
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="refresh-info" id="refreshInfo">
+      Memuat statistik...
+    </div>
+
+
+    <!-- =========================
+         QR SCANNER
+    ========================== -->
+
     <div id="reader"></div>
 
     <button id="startBtn">
       AKTIFKAN KAMERA
     </button>
 
+
     <div id="result" class="result">
-      Siap. Tekan <b>AKTIFKAN KAMERA</b>, izinkan kamera,
-      lalu arahkan ke QR BIB.
+      Siap. Tekan <b>AKTIFKAN KAMERA</b>,
+      izinkan kamera, lalu arahkan ke QR BIB.
     </div>
+
+
+    <!-- =========================
+         MANUAL BIB
+    ========================== -->
 
     <div class="manual">
 
@@ -149,326 +272,450 @@
       </button>
 
       <small>
-        Setelah QR terbaca, sistem akan melakukan check-in
-        otomatis tanpa membuka Google Drive.
+        Setelah QR terbaca, scanner akan membuka
+        sistem Check-in Hino dan BIB tersebut
+        diproses otomatis.
       </small>
 
     </div>
 
   </div>
+
 </div>
+
 
 <script>
 
-const APP_URL =
-"https://script.google.com/macros/s/AKfycbzAhqm744ZPESuxOcTzybAFfnLlU_r7Y6b2VOvogkoGTEiyO2B5an1bZ5AQW0_UsxGz/exec";
+  /* =========================
+     CONFIG
+  ========================= */
 
-let scanner = null;
-let locked = false;
-
-
-/* =========================
-   TAMPILKAN PESAN
-========================= */
-
-function show(msg, cls="result") {
-
-  const el = document.getElementById("result");
-
-  el.className = "result " + cls;
-
-  el.innerHTML = msg;
-
-}
+  const APP_URL =
+    "https://script.google.com/macros/s/AKfycbzAhqm744ZPESuxOcTzybAFfnLlU_r7Y6b2VOvogkoGTEiyO2B5an1bZ5AQW0_UsxGz/exec";
 
 
-/* =========================
-   AMBIL NOMOR BIB DARI QR
-========================= */
+  const STATS_URL =
+    APP_URL + "?action=stats";
 
-function extractBib(text) {
-  text = String(text || "").trim();
 
-  // Membaca QR dengan format:
-  // ?b=M26005
-  // atau:
-  // ?bib=M26005
+  let scanner = null;
+  let locked = false;
 
-  const m = text.match(/(?:[?&](?:b|bib)=)([A-Za-z0-9_-]+)/i);
 
-  if (m) {
-    return m[1].toUpperCase();
+  /* =========================
+     RESULT
+  ========================= */
+
+  function show(msg, cls = "result") {
+
+    const el =
+      document.getElementById("result");
+
+    el.className =
+      "result " + cls;
+
+    el.innerHTML = msg;
   }
 
-  // Jika QR langsung berisi nomor BIB
-  if (/^[A-Z]\d{5}$/i.test(text)) {
-    return text.toUpperCase();
+
+  /* =========================
+     FORMAT ANGKA
+  ========================= */
+
+  function formatNumber(number) {
+
+    return Number(number || 0)
+      .toLocaleString("id-ID");
+
   }
 
-  return "";
-}
+
+  /* =========================
+     UPDATE STATISTIK
+  ========================= */
+
+  function updateStats(data) {
+
+    if (!data || !data.ok) {
+
+      document.getElementById("refreshInfo")
+        .textContent =
+        "Statistik tidak dapat dimuat.";
+
+      return;
+    }
 
 
-/* =========================
-   KIRIM CHECK-IN
-   TANPA PINDAH HALAMAN
-========================= */
+    document.getElementById("totalPeserta")
+      .textContent =
+      formatNumber(data.total);
 
-function processCheckin(bib) {
 
-  if (!bib || locked) return;
+    document.getElementById("totalHadir")
+      .textContent =
+      formatNumber(data.hadir);
 
-  locked = true;
 
-  show(
-    "QR TERBACA: <b>" + bib + "</b><br>" +
-    "Membuka sistem check-in...",
-    "ok"
+    document.getElementById("totalBelum")
+      .textContent =
+      formatNumber(data.belum);
+
+
+    document.getElementById("refreshInfo")
+      .textContent =
+      "Statistik diperbarui: " +
+      new Date().toLocaleTimeString(
+        "id-ID",
+        {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        }
+      );
+
+  }
+
+
+  /* =========================
+     LOAD STATISTIK
+     JSONP
+  ========================= */
+
+  function loadStats() {
+
+    const callbackName =
+      "statsCallback_" +
+      Date.now();
+
+
+    window[callbackName] =
+      function(data) {
+
+        updateStats(data);
+
+        delete window[callbackName];
+
+        const script =
+          document.getElementById(
+            callbackName
+          );
+
+        if (script) {
+          script.remove();
+        }
+
+      };
+
+
+    const script =
+      document.createElement("script");
+
+
+    script.id =
+      callbackName;
+
+
+    script.src =
+      STATS_URL +
+      "&callback=" +
+      callbackName;
+
+
+    script.onerror =
+      function() {
+
+        document.getElementById(
+          "refreshInfo"
+        ).textContent =
+          "Gagal memuat statistik.";
+
+        delete window[callbackName];
+
+        script.remove();
+
+      };
+
+
+    document.body.appendChild(script);
+
+  }
+
+
+  /* =========================
+     AUTO REFRESH
+     10 DETIK
+  ========================= */
+
+  loadStats();
+
+  setInterval(
+    loadStats,
+    10000
   );
 
-  if (scanner) {
-    scanner.stop().catch(() => {});
-    scanner = null;
+
+  /* =========================
+     EXTRACT BIB
+  ========================= */
+
+  function extractBib(text) {
+
+    text =
+      String(text || "").trim();
+
+
+    /*
+      Accept:
+
+      M26001
+      F26001
+
+      atau URL:
+      ?bib=M26001
+    */
+
+    const m =
+      text.match(
+        /(?:[?&]bib=)([A-Za-z0-9_-]+)/i
+      );
+
+
+    if (m) {
+
+      return m[1]
+        .toUpperCase();
+
+    }
+
+
+    if (
+      /^[MF]\d{5}$/i.test(text)
+    ) {
+
+      return text
+        .toUpperCase();
+
+    }
+
+
+    return "";
+
   }
 
-  // Kirim BIB langsung ke Apps Script
-  // melalui navigasi HTTPS.
-  // Apps Script akan melakukan check-in
-  // kemudian mengembalikan pengguna ke GitHub.
 
-  const url =
-    APP_URL +
-    "?bib=" +
-    encodeURIComponent(bib);
+  /* =========================
+     OPEN CHECK-IN
+  ========================= */
 
-  window.location.href = url;
-}
+  function goToCheckin(bib) {
 
-/* =========================
-   HASIL DARI APPS SCRIPT
-========================= */
-
-(function handleResult() {
-
-  const params =
-    new URLSearchParams(window.location.search);
-
-  const status =
-    params.get('status');
-
-  const bib =
-    params.get('bib');
-
-  const message =
-    params.get('message');
+    if (!bib || locked) {
+      return;
+    }
 
 
-  if (!status || !bib) {
-    return;
-  }
+    locked = true;
 
-
-  if (status === 'SUCCESS') {
 
     show(
-      "<b>✓ CHECK-IN BERHASIL</b><br><br>" +
-      "BIB: <b>" + bib + "</b><br>" +
-      "Data sudah masuk ke Google Sheet.",
+      "QR terbaca: <b>" +
+      bib +
+      "</b><br>" +
+      "Membuka sistem check-in...",
       "ok"
     );
 
-  }
 
-  else if (status === 'DUPLICATE') {
+    if (scanner) {
 
-    show(
-      "<b>⚠ PESERTA SUDAH CHECK-IN</b><br><br>" +
-      "BIB: <b>" + bib + "</b>",
-      "warn"
-    );
+      scanner
+        .stop()
+        .catch(() => {});
 
-  }
+    }
 
-  else if (status === 'NOT_FOUND') {
 
-    show(
-      "<b>✕ BIB TIDAK DITEMUKAN</b><br><br>" +
-      "BIB: <b>" + bib + "</b>",
-      "err"
-    );
-
-  }
-
-  else {
-
-    show(
-      "<b>✕ CHECK-IN GAGAL</b><br><br>" +
-      "BIB: <b>" + bib + "</b><br>" +
-      (message || "Terjadi kesalahan."),
-      "err"
-    );
+    window.location.href =
+      APP_URL +
+      "?bib=" +
+      encodeURIComponent(bib);
 
   }
 
 
-  // Bersihkan parameter URL
-  window.history.replaceState(
-    {},
-    document.title,
-    window.location.pathname
-  );
+  /* =========================
+     START SCANNER
+  ========================= */
 
-})();
-  
-/* =========================
-   START CAMERA
-========================= */
+  async function startScanner() {
 
-async function startScanner() {
-
-  if (scanner) return;
+    if (scanner) {
+      return;
+    }
 
 
-  if (typeof Html5Qrcode === "undefined") {
+    if (
+      typeof Html5Qrcode ===
+      "undefined"
+    ) {
 
-    show(
-      "Scanner belum siap. " +
-      "Periksa koneksi internet lalu coba lagi.",
-      "err"
-    );
+      show(
+        "Scanner belum siap. " +
+        "Periksa koneksi internet lalu coba lagi.",
+        "err"
+      );
 
-    return;
-  }
+      return;
 
-
-  scanner = new Html5Qrcode("reader");
-
-
-  const config = {
-
-    fps: 10,
-
-    qrbox: {
-      width: 260,
-      height: 260
-    },
-
-    aspectRatio: 1.0
-
-  };
+    }
 
 
-  try {
+    scanner =
+      new Html5Qrcode("reader");
 
-    await scanner.start(
 
-      {
-        facingMode: "environment"
+    const config = {
+
+      fps: 10,
+
+      qrbox: {
+        width: 260,
+        height: 260
       },
 
-      config,
+      aspectRatio: 1.0
 
-      (decodedText) => {
-
-        const bib = extractBib(decodedText);
+    };
 
 
-        if (bib) {
+    try {
 
-          processCheckin(bib);
+      await scanner.start(
 
-        } else {
+        {
+          facingMode:
+            "environment"
+        },
+
+        config,
+
+        (decodedText) => {
+
+          const bib =
+            extractBib(decodedText);
+
+
+          if (bib) {
+
+            goToCheckin(bib);
+
+          } else {
+
+            show(
+              "QR terbaca, tetapi format BIB " +
+              "tidak dikenali:<br><b>" +
+              decodedText +
+              "</b>",
+              "warn"
+            );
+
+          }
+
+        },
+
+        () => {}
+
+      );
+
+
+      document.getElementById(
+        "startBtn"
+      ).style.display = "none";
+
+
+      show(
+        "Kamera aktif. Arahkan ke QR pada BIB.",
+        "result"
+      );
+
+    }
+
+
+    catch (e) {
+
+      scanner = null;
+
+
+      show(
+
+        "<b>Kamera tidak dapat diaktifkan.</b><br>" +
+
+        "Pastikan halaman dibuka melalui HTTPS " +
+
+        "dan izin kamera diberikan. " +
+
+        "Jika tetap gagal, gunakan input BIB manual di bawah.",
+
+        "err"
+
+      );
+
+    }
+
+  }
+
+
+  /* =========================
+     CAMERA BUTTON
+  ========================= */
+
+  document
+    .getElementById("startBtn")
+    .addEventListener(
+      "click",
+      startScanner
+    );
+
+
+  /* =========================
+     MANUAL CHECK-IN
+  ========================= */
+
+  document
+    .getElementById("manualBtn")
+    .addEventListener(
+      "click",
+      () => {
+
+        const bib =
+          document
+            .getElementById(
+              "manualBib"
+            )
+            .value
+            .trim()
+            .toUpperCase();
+
+
+        if (
+          !/^[MF]\d{5}$/.test(bib)
+        ) {
 
           show(
-            "QR terbaca, tetapi format BIB tidak dikenali:<br>" +
-            "<b>" + decodedText + "</b>",
+            "Format BIB tidak valid. " +
+            "Contoh: <b>M26001</b>.",
             "warn"
           );
 
+          return;
+
         }
 
-      },
 
-      () => {}
+        goToCheckin(bib);
 
-    );
-
-
-    document.getElementById(
-      "startBtn"
-    ).style.display = "none";
-
-
-    show(
-      "Kamera aktif.<br>" +
-      "Arahkan kamera ke QR pada BIB.",
-      "result"
-    );
-
-
-  } catch (e) {
-
-    scanner = null;
-
-    show(
-      "<b>Kamera tidak dapat diaktifkan.</b><br>" +
-      "Pastikan halaman dibuka melalui HTTPS " +
-      "dan izin kamera diberikan.<br><br>" +
-      "Jika tetap gagal, gunakan input BIB manual.",
-      "err"
-    );
-
-  }
-
-}
-
-
-/* =========================
-   TOMBOL KAMERA
-========================= */
-
-document
-  .getElementById("startBtn")
-  .addEventListener(
-    "click",
-    startScanner
-  );
-
-
-/* =========================
-   CHECK-IN MANUAL
-========================= */
-
-document
-  .getElementById("manualBtn")
-  .addEventListener(
-    "click",
-    () => {
-
-      const bib =
-        document
-        .getElementById("manualBib")
-        .value
-        .trim()
-        .toUpperCase();
-
-
-      if (!/^[MF]\d{5}$/.test(bib)) {
-
-        show(
-          "Format BIB tidak valid.<br>" +
-          "Contoh: <b>M26001</b>.",
-          "warn"
-        );
-
-        return;
       }
-
-
-      processCheckin(bib);
-
-    }
-  );
+    );
 
 </script>
 
