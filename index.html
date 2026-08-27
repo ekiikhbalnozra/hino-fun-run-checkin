@@ -383,63 +383,56 @@
 
   function loadStats() {
 
-    const callbackName =
-      "statsCallback_" +
-      Date.now();
+  const callbackName =
+    "statsCallback_" + Date.now();
 
+  window[callbackName] = function(data) {
 
-    window[callbackName] =
-      function(data) {
+    console.log("STATISTICS:", data);
 
-        updateStats(data);
+    updateStats(data);
 
-        delete window[callbackName];
-
-        const script =
-          document.getElementById(
-            callbackName
-          );
-
-        if (script) {
-          script.remove();
-        }
-
-      };
-
+    delete window[callbackName];
 
     const script =
-      document.createElement("script");
+      document.getElementById(callbackName);
 
+    if (script) {
+      script.remove();
+    }
+  };
 
-    script.id =
-      callbackName;
+  const script =
+    document.createElement("script");
 
+  script.id = callbackName;
 
-    script.src =
-      STATS_URL +
-      "&callback=" +
-      callbackName;
+  script.src =
+    STATS_URL +
+    "&callback=" +
+    callbackName +
+    "&t=" +
+    Date.now();
 
+  script.onerror = function() {
 
-    script.onerror =
-      function() {
+    console.error(
+      "Gagal mengambil statistik dari:",
+      script.src
+    );
 
-        document.getElementById(
-          "refreshInfo"
-        ).textContent =
-          "Gagal memuat statistik.";
+    document.getElementById(
+      "refreshInfo"
+    ).textContent =
+      "Gagal memuat statistik.";
 
-        delete window[callbackName];
+    delete window[callbackName];
 
-        script.remove();
+    script.remove();
+  };
 
-      };
-
-
-    document.body.appendChild(script);
-
-  }
-
+  document.body.appendChild(script);
+}
 
   /* =========================
      AUTO REFRESH
