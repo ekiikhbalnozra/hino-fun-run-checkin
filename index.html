@@ -4,713 +4,313 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#e30613">
-
   <title>Hino Fun Run 2026 - Check-in</title>
-
   <script src="https://unpkg.com/html5-qrcode" defer></script>
-
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f3f4f6;
-      color: #111827;
-    }
-
-    .wrap {
-      max-width: 520px;
-      margin: 0 auto;
-      padding: 18px;
-    }
-
-    .card {
-      background: #fff;
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow: 0 4px 18px rgba(0,0,0,.10);
-    }
-
-    h1 {
-      margin: 0 0 4px;
-      font-size: 24px;
-    }
-
-    .sub {
-      color: #6b7280;
-      margin-bottom: 16px;
-    }
-
-    /* =========================
-       STATISTIK
-    ========================= */
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .stat {
-      padding: 12px 6px;
-      border-radius: 12px;
-      text-align: center;
-      background: #f3f4f6;
-    }
-
-    .stat-number {
-      font-size: 24px;
-      font-weight: 800;
-      line-height: 1.1;
-    }
-
-    .stat-label {
-      margin-top: 5px;
-      font-size: 11px;
-      color: #6b7280;
-      font-weight: 700;
-    }
-
-    .stat.total {
-      background: #e5e7eb;
-    }
-
-    .stat.hadir {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .stat.belum {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .refresh-info {
-      text-align: center;
-      font-size: 11px;
-      color: #9ca3af;
-      margin-top: -8px;
-      margin-bottom: 14px;
-    }
-
-    /* =========================
-       SCANNER
-    ========================= */
-
-    #reader {
-      width: 100%;
-      overflow: hidden;
-      border-radius: 14px;
-      border: 2px solid #ddd;
-    }
-
-    button {
-      width: 100%;
-      border: 0;
-      border-radius: 12px;
-      padding: 15px;
-      font-size: 17px;
-      font-weight: 700;
-      cursor: pointer;
-      background: #e30613;
-      color: #fff;
-      margin-top: 12px;
-    }
-
-    button.secondary {
-      background: #4b5563;
-    }
-
-    .result {
-      margin-top: 16px;
-      padding: 15px;
-      border-radius: 12px;
-      background: #eef2f7;
-      line-height: 1.55;
-    }
-
-    .ok {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .warn {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .err {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .manual {
-      margin-top: 18px;
-      padding-top: 16px;
-      border-top: 1px solid #e5e7eb;
-    }
-
-    input {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid #d1d5db;
-      border-radius: 10px;
-      font-size: 17px;
-      text-transform: uppercase;
-      margin-top: 8px;
-    }
-
-    small {
-      color: #6b7280;
-      display: block;
-      margin-top: 10px;
-      line-height: 1.4;
-    }
-
-    .loading {
-      opacity: .6;
-    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,sans-serif;background:#f3f4f6;color:#111827}
+    .wrap{max-width:520px;margin:0 auto;padding:18px}
+    .card{background:#fff;border-radius:18px;padding:20px;box-shadow:0 4px 18px rgba(0,0,0,.10)}
+    h1{margin:0 0 4px;font-size:24px}.sub{color:#6b7280;margin-bottom:16px}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+    .stat{padding:12px 6px;border-radius:12px;text-align:center;background:#f3f4f6}
+    .stat-number{font-size:24px;font-weight:800;line-height:1.1;min-height:27px}
+    .stat-label{margin-top:5px;font-size:11px;color:#6b7280;font-weight:700}
+    .stat.total{background:#e5e7eb}.stat.hadir{background:#dcfce7;color:#166534}
+    .stat.belum{background:#fef3c7;color:#92400e}
+    .refresh-info{text-align:center;font-size:11px;color:#9ca3af;margin-top:-8px;margin-bottom:14px;min-height:14px}
+    #reader{width:100%;overflow:hidden;border-radius:14px;border:2px solid #ddd}
+    button{width:100%;border:0;border-radius:12px;padding:15px;font-size:17px;font-weight:700;cursor:pointer;background:#e30613;color:#fff;margin-top:12px}
+    button.secondary{background:#4b5563}
+    button:disabled{opacity:.55;cursor:not-allowed}
+    .result{margin-top:16px;padding:15px;border-radius:12px;background:#eef2f7;line-height:1.55}
+    .ok{background:#dcfce7;color:#166534}.warn{background:#fef3c7;color:#92400e}.err{background:#fee2e2;color:#991b1b}
+    .manual{margin-top:18px;padding-top:16px;border-top:1px solid #e5e7eb}
+    input{width:100%;padding:14px;border:1px solid #d1d5db;border-radius:10px;font-size:17px;text-transform:uppercase;margin-top:8px}
+    small{color:#6b7280;display:block;margin-top:10px;line-height:1.4}
   </style>
 </head>
-
 <body>
-
 <div class="wrap">
-
   <div class="card">
-
     <h1>Hino Fun Run 2026</h1>
-
-    <div class="sub">
-      CHECK-IN PESERTA — QR SCANNER
-    </div>
-
-
-    <!-- =========================
-         STATISTIK PESERTA
-    ========================== -->
+    <div class="sub">CHECK-IN PESERTA — QR SCANNER</div>
 
     <div class="stats">
-
       <div class="stat total">
-        <div class="stat-number" id="totalPeserta">
-          -
-        </div>
-
-        <div class="stat-label">
-          TOTAL PESERTA
-        </div>
+        <div class="stat-number" id="totalPeserta">-</div>
+        <div class="stat-label">TOTAL PESERTA</div>
       </div>
-
-
       <div class="stat hadir">
-        <div class="stat-number" id="totalHadir">
-          -
-        </div>
-
-        <div class="stat-label">
-          SUDAH CHECK-IN
-        </div>
+        <div class="stat-number" id="totalHadir">-</div>
+        <div class="stat-label">SUDAH CHECK-IN</div>
       </div>
-
-
       <div class="stat belum">
-        <div class="stat-number" id="totalBelum">
-          -
-        </div>
-
-        <div class="stat-label">
-          BELUM CHECK-IN
-        </div>
+        <div class="stat-number" id="totalBelum">-</div>
+        <div class="stat-label">BELUM CHECK-IN</div>
       </div>
-
     </div>
 
-
-    <div class="refresh-info" id="refreshInfo">
-      Memuat statistik...
-    </div>
-
-
-    <!-- =========================
-         QR SCANNER
-    ========================== -->
+    <div class="refresh-info" id="refreshInfo">Memuat statistik...</div>
 
     <div id="reader"></div>
-
-    <button id="startBtn">
-      AKTIFKAN KAMERA
-    </button>
-
+    <button id="startBtn">AKTIFKAN KAMERA</button>
 
     <div id="result" class="result">
-      Siap. Tekan <b>AKTIFKAN KAMERA</b>,
-      izinkan kamera, lalu arahkan ke QR BIB.
+      Siap. Tekan <b>AKTIFKAN KAMERA</b>, izinkan kamera, lalu arahkan ke QR BIB.
     </div>
-
-
-    <!-- =========================
-         MANUAL BIB
-    ========================== -->
 
     <div class="manual">
-
       <b>Backup: input BIB manual</b>
-
-      <input
-        id="manualBib"
-        placeholder="Contoh: M26001"
-        autocomplete="off"
-      >
-
-      <button id="manualBtn">
-        CHECK-IN MANUAL
-      </button>
-
+      <input id="manualBib" placeholder="Contoh: M26001" autocomplete="off" maxlength="6">
+      <button id="manualBtn">CHECK-IN MANUAL</button>
       <small>
-        Setelah QR terbaca, scanner akan membuka
-        sistem Check-in Hino dan BIB tersebut
-        diproses otomatis.
+        Setelah QR terbaca, scanner akan membuka sistem Check-in Hino dan BIB tersebut diproses otomatis.
       </small>
-
     </div>
-
   </div>
-
 </div>
 
-
 <script>
-
-  /* =========================
+  /* =========================================================
      CONFIG
-  ========================= */
-
+     ========================================================= */
   const APP_URL =
     "https://script.google.com/macros/s/AKfycbzAhqm744ZPESuxOcTzybAFfnLlU_r7Y6b2VOvogkoGTEiyO2B5an1bZ5AQW0_UsxGz/exec";
 
-
-  const STATS_URL =
-    APP_URL + "?action=stats";
-
-
   let scanner = null;
   let locked = false;
+  let statsTimer = null;
 
-
-  /* =========================
-     RESULT
-  ========================= */
-
-  function show(msg, cls = "result") {
-
-    const el =
-      document.getElementById("result");
-
-    el.className =
-      "result " + cls;
-
-    el.innerHTML = msg;
+  function formatNumber(value) {
+    return Number(value || 0).toLocaleString("id-ID");
   }
 
-
-  /* =========================
-     FORMAT ANGKA
-  ========================= */
-
-  function formatNumber(number) {
-
-    return Number(number || 0)
-      .toLocaleString("id-ID");
-
+  function show(message, cls = "") {
+    const el = document.getElementById("result");
+    el.className = "result " + cls;
+    el.innerHTML = message;
   }
-
-
-  /* =========================
-     UPDATE STATISTIK
-  ========================= */
 
   function updateStats(data) {
-
-    if (!data || !data.ok) {
-
-      document.getElementById("refreshInfo")
-        .textContent =
-        "Statistik tidak dapat dimuat.";
-
+    if (!data || data.ok !== true) {
+      document.getElementById("refreshInfo").textContent =
+        "Data statistik tidak valid.";
       return;
     }
 
+    document.getElementById("totalPeserta").textContent = formatNumber(data.total);
+    document.getElementById("totalHadir").textContent = formatNumber(data.hadir);
+    document.getElementById("totalBelum").textContent = formatNumber(data.belum);
 
-    document.getElementById("totalPeserta")
-      .textContent =
-      formatNumber(data.total);
-
-
-    document.getElementById("totalHadir")
-      .textContent =
-      formatNumber(data.hadir);
-
-
-    document.getElementById("totalBelum")
-      .textContent =
-      formatNumber(data.belum);
-
-
-    document.getElementById("refreshInfo")
-      .textContent =
+    document.getElementById("refreshInfo").textContent =
       "Statistik diperbarui: " +
-      new Date().toLocaleTimeString(
-        "id-ID",
-        {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit"
-        }
-      );
-
+      new Date().toLocaleTimeString("id-ID", {
+        hour:"2-digit", minute:"2-digit", second:"2-digit"
+      });
   }
 
+  /* =========================================================
+     LOAD STATISTIK - JSONP
+     Dibuat sebagai callback global unik agar kompatibel
+     dengan Google Apps Script ContentService.
+     ========================================================= */
+  function loadStats() {
+    const old = document.getElementById("statsScript");
+    if (old) old.remove();
 
-  /* =========================
-     LOAD STATISTIK
-     JSONP
-  ========================= */
+    const callbackName =
+      "__hinoStats_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
 
-  function statsCallback(data) {
-  console.log("STATISTICS:", data);
+    const script = document.createElement("script");
+    script.id = "statsScript";
+    script.async = true;
 
-  if (data && data.ok) {
-    updateStats(data);
+    let finished = false;
 
-    document.getElementById("refreshInfo").textContent =
-      "Statistik diperbarui.";
-  } else {
-    document.getElementById("refreshInfo").textContent =
-      "Data statistik tidak valid.";
+    window[callbackName] = function(data) {
+      finished = true;
+      console.log("HINO STATISTICS:", data);
+      updateStats(data);
+      cleanup();
+    };
+
+    function cleanup() {
+      delete window[callbackName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+
+    script.onerror = function() {
+      if (finished) return;
+      document.getElementById("refreshInfo").textContent =
+        "Gagal memuat statistik. Coba refresh.";
+      cleanup();
+    };
+
+    script.src =
+      APP_URL +
+      "?action=stats" +
+      "&callback=" + encodeURIComponent(callbackName) +
+      "&t=" + Date.now();
+
+    document.body.appendChild(script);
+
+    /* Jangan biarkan callback global tertinggal bila request macet. */
+    setTimeout(function() {
+      if (!finished) {
+        document.getElementById("refreshInfo").textContent =
+          "Gagal memuat statistik. Coba refresh.";
+        cleanup();
+      }
+    }, 10000);
   }
-}
 
-function loadStats() {
-
-  const oldScript =
-    document.getElementById("statsScript");
-
-  if (oldScript) {
-    oldScript.remove();
-  }
-
-  const script =
-    document.createElement("script");
-
-  script.id = "statsScript";
-
-  script.src =
-    STATS_URL +
-    "&callback=statsCallback&t=" +
-    Date.now();
-
-  script.onerror = function() {
-
-    console.error(
-      "Gagal memuat statistik:",
-      script.src
-    );
-
-    document.getElementById(
-      "refreshInfo"
-    ).textContent =
-      "Gagal memuat statistik.";
-  };
-
-  document.body.appendChild(script);
-}
-
-  /* =========================
-     AUTO REFRESH
-     5 DETIK
-  ========================= */
-
-  loadStats();
-
-  setInterval(
-    loadStats,
-    5000
-  );
-
-
-  /* =========================
+  /* =========================================================
      EXTRACT BIB
-  ========================= */
-
+     M26001 / F26001
+     atau URL yang mengandung ?bib=M26001
+     ========================================================= */
   function extractBib(text) {
+    text = String(text || "").trim();
 
-    text =
-      String(text || "").trim();
+    try {
+      const url = new URL(text);
+      const bib = url.searchParams.get("bib");
+      if (bib && /^[MF]\d{5}$/i.test(bib.trim())) {
+        return bib.trim().toUpperCase();
+      }
+    } catch (_) {}
 
-
-    /*
-      Accept:
-
-      M26001
-      F26001
-
-      atau URL:
-      ?bib=M26001
-    */
-
-    const m =
-      text.match(
-        /(?:[?&]bib=)([A-Za-z0-9_-]+)/i
-      );
-
-
-    if (m) {
-
-      return m[1]
-        .toUpperCase();
-
+    const match = text.match(/[?&]bib=([A-Za-z0-9_-]+)/i);
+    if (match && /^[MF]\d{5}$/i.test(match[1])) {
+      return match[1].toUpperCase();
     }
 
-
-    if (
-      /^[MF]\d{5}$/i.test(text)
-    ) {
-
-      return text
-        .toUpperCase();
-
+    if (/^[MF]\d{5}$/i.test(text)) {
+      return text.toUpperCase();
     }
-
 
     return "";
-
   }
 
-
-  /* =========================
+  /* =========================================================
      OPEN CHECK-IN
-  ========================= */
-
+     ========================================================= */
   function goToCheckin(bib) {
-
-    if (!bib || locked) {
-      return;
-    }
-
+    if (!bib || locked) return;
 
     locked = true;
-
+    document.getElementById("manualBtn").disabled = true;
+    document.getElementById("startBtn").disabled = true;
 
     show(
-      "QR terbaca: <b>" +
-      bib +
-      "</b><br>" +
-      "Membuka sistem check-in...",
+      "QR terbaca: <b>" + bib + "</b><br>Membuka sistem check-in...",
       "ok"
     );
 
-
     if (scanner) {
-
-      scanner
-        .stop()
-        .catch(() => {});
-
+      scanner.stop().catch(function(){});
     }
-
 
     window.location.href =
-      APP_URL +
-      "?bib=" +
-      encodeURIComponent(bib);
-
+      APP_URL + "?bib=" + encodeURIComponent(bib);
   }
 
-
-  /* =========================
-     START SCANNER
-  ========================= */
-
+  /* =========================================================
+     START CAMERA
+     ========================================================= */
   async function startScanner() {
+    if (scanner) return;
 
-    if (scanner) {
-      return;
-    }
-
-
-    if (
-      typeof Html5Qrcode ===
-      "undefined"
-    ) {
-
+    if (typeof Html5Qrcode === "undefined") {
       show(
-        "Scanner belum siap. " +
-        "Periksa koneksi internet lalu coba lagi.",
+        "Scanner belum siap. Periksa koneksi internet lalu coba lagi.",
         "err"
       );
-
       return;
-
     }
 
+    const reader = document.getElementById("reader");
+    reader.innerHTML = "";
 
-    scanner =
-      new Html5Qrcode("reader");
-
+    scanner = new Html5Qrcode("reader");
 
     const config = {
-
       fps: 10,
-
-      qrbox: {
-        width: 260,
-        height: 260
-      },
-
+      qrbox: { width: 260, height: 260 },
       aspectRatio: 1.0
-
     };
 
-
     try {
-
       await scanner.start(
-
-        {
-          facingMode:
-            "environment"
-        },
-
+        { facingMode: "environment" },
         config,
+        function(decodedText) {
+          if (locked) return;
 
-        (decodedText) => {
-
-          const bib =
-            extractBib(decodedText);
-
+          const bib = extractBib(decodedText);
 
           if (bib) {
-
             goToCheckin(bib);
-
           } else {
-
             show(
-              "QR terbaca, tetapi format BIB " +
-              "tidak dikenali:<br><b>" +
-              decodedText +
+              "QR terbaca, tetapi format BIB tidak dikenali:<br><b>" +
+              String(decodedText).replace(/</g, "&lt;") +
               "</b>",
               "warn"
             );
-
           }
-
         },
-
-        () => {}
-
+        function() {}
       );
 
-
-      document.getElementById(
-        "startBtn"
-      ).style.display = "none";
-
-
-      show(
-        "Kamera aktif. Arahkan ke QR pada BIB.",
-        "result"
-      );
-
-    }
-
-
-    catch (e) {
-
+      document.getElementById("startBtn").style.display = "none";
+      show("Kamera aktif. Arahkan ke QR pada BIB.", "");
+    } catch (error) {
+      console.error("Camera error:", error);
       scanner = null;
 
-
       show(
-
         "<b>Kamera tidak dapat diaktifkan.</b><br>" +
-
-        "Pastikan halaman dibuka melalui HTTPS " +
-
-        "dan izin kamera diberikan. " +
-
+        "Pastikan halaman dibuka melalui HTTPS dan izin kamera diberikan. " +
         "Jika tetap gagal, gunakan input BIB manual di bawah.",
-
         "err"
-
       );
-
     }
-
   }
 
+  /* =========================================================
+     BUTTONS
+     ========================================================= */
+  document.getElementById("startBtn").addEventListener("click", startScanner);
 
-  /* =========================
-     CAMERA BUTTON
-  ========================= */
+  document.getElementById("manualBtn").addEventListener("click", function() {
+    const input = document.getElementById("manualBib");
+    const bib = input.value.trim().toUpperCase();
 
-  document
-    .getElementById("startBtn")
-    .addEventListener(
-      "click",
-      startScanner
-    );
+    if (!/^[MF]\d{5}$/.test(bib)) {
+      show(
+        "Format BIB tidak valid. Contoh: <b>M26001</b> atau <b>F26001</b>.",
+        "warn"
+      );
+      input.focus();
+      return;
+    }
 
+    goToCheckin(bib);
+  });
 
-  /* =========================
-     MANUAL CHECK-IN
-  ========================= */
+  document.getElementById("manualBib").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+      document.getElementById("manualBtn").click();
+    }
+  });
 
-  document
-    .getElementById("manualBtn")
-    .addEventListener(
-      "click",
-      () => {
-
-        const bib =
-          document
-            .getElementById(
-              "manualBib"
-            )
-            .value
-            .trim()
-            .toUpperCase();
-
-
-        if (
-          !/^[MF]\d{5}$/.test(bib)
-        ) {
-
-          show(
-            "Format BIB tidak valid. " +
-            "Contoh: <b>M26001</b>.",
-            "warn"
-          );
-
-          return;
-
-        }
-
-
-               goToCheckin(bib);
-
-      }
-    );
-
-  /* =========================
-     SELESAI
-  ========================= */
-
+  /* =========================================================
+     INITIAL LOAD + AUTO REFRESH 5 DETIK
+     ========================================================= */
+  loadStats();
+  statsTimer = setInterval(loadStats, 5000);
 </script>
-
 </body>
 </html>
