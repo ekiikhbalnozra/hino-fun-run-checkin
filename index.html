@@ -443,14 +443,14 @@
 
   /* =========================
      AUTO REFRESH
-     10 DETIK
+     5 DETIK
   ========================= */
 
   loadStats();
 
   setInterval(
     loadStats,
-    10000
+    5000
   );
 
 
@@ -716,7 +716,87 @@
 
       }
     );
+/* =========================
+   LOAD STATISTIK PESERTA
+========================= */
 
+function loadStats() {
+
+  const callbackName =
+    'hinoStatsCallback_' + Date.now();
+
+  const script =
+    document.createElement('script');
+
+  window[callbackName] = function(data) {
+
+    try {
+
+      if (!data || !data.ok) {
+        throw new Error('Data statistik tidak valid');
+      }
+
+      document.getElementById('totalPeserta').textContent =
+        data.total;
+
+      document.getElementById('totalHadir').textContent =
+        data.hadir;
+
+      document.getElementById('totalBelum').textContent =
+        data.belum;
+
+      document.getElementById('refreshInfo').textContent =
+        'Terakhir diperbarui: ' +
+        new Date().toLocaleTimeString('id-ID');
+
+    } catch (err) {
+
+      document.getElementById('refreshInfo').textContent =
+        'Gagal memuat statistik';
+
+    } finally {
+
+      delete window[callbackName];
+
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+
+    }
+
+  };
+
+  script.src =
+    STATS_URL +
+    '&callback=' +
+    encodeURIComponent(callbackName);
+
+  script.onerror = function() {
+
+    document.getElementById('refreshInfo').textContent =
+      'Gagal terhubung ke database';
+
+    delete window[callbackName];
+
+    if (script.parentNode) {
+      script.parentNode.removeChild(script);
+    }
+
+  };
+
+  document.body.appendChild(script);
+}
+
+
+/* =========================
+   JALANKAN STATISTIK
+========================= */
+
+loadStats();
+
+/* Refresh otomatis setiap 10 detik */
+setInterval(loadStats, 10000);
+  
 </script>
 
 </body>
