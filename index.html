@@ -365,25 +365,80 @@ function loadStats(){
 
 function extractBib(text){
 
-  text =
-    String(text || "").trim();
+  text = String(text || "").trim();
 
-  try{
+  /*
+   * =====================================================
+   * 1. Jika QR berisi URL
+   *    Support:
+   *    ?bib=M26001
+   *    ?b=M26001
+   * =====================================================
+   */
 
-    const url =
-      new URL(text);
+  try {
+
+    const url = new URL(text);
 
     const bib =
-      url.searchParams.get("bib");
+      url.searchParams.get("bib") ||
+      url.searchParams.get("b");
 
-    if(
+    if (
       bib &&
       /^[MF]\d{5}$/i.test(bib.trim())
-    ){
+    ) {
+
       return bib
         .trim()
         .toUpperCase();
+
     }
+
+  } catch(e) {}
+
+
+  /*
+   * =====================================================
+   * 2. Backup jika URL tidak berhasil diparse
+   * =====================================================
+   */
+
+  const match =
+    text.match(
+      /[?&](?:bib|b)=([A-Za-z0-9_-]+)/i
+    );
+
+  if (
+    match &&
+    /^[MF]\d{5}$/i.test(match[1])
+  ) {
+
+    return match[1]
+      .toUpperCase();
+
+  }
+
+
+  /*
+   * =====================================================
+   * 3. Jika QR langsung berisi:
+   *    M26001 / F26001
+   * =====================================================
+   */
+
+  if (
+    /^[MF]\d{5}$/i.test(text)
+  ) {
+
+    return text.toUpperCase();
+
+  }
+
+
+  return "";
+
+}
 
   }catch(e){}
 
