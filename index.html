@@ -310,7 +310,7 @@ Backup: input BIB manual
 
 <input
   id="manualBib"
-  placeholder="Contoh: M26001 / H26037"
+  placeholder="Contoh: M26001 / F26001 / H26001 / S26001 / P26001 / I26001"
   autocomplete="off"
   maxlength="6"
 >
@@ -331,8 +331,8 @@ M / F / H / S / P / I
 
 Contoh:
 
-M26001, F26001, H26037,
-S26018, P26023, I26020.
+M26001, F26001, H26001,
+S26001, P26001, I26001.
 
 <br><br>
 
@@ -717,10 +717,10 @@ function extractBib(text){
   // BACKUP REGEX
   // Mendukung:
   //
-  // ?b=H26037
-  // ?bib=H26037
-  // &b=H26037
-  // &bib=H26037
+  // ?b=H26001
+  // ?bib=H26001
+  // &b=H26001
+  // &bib=H26001
   // -------------------------------------------------------
 
   const match =
