@@ -1,15 +1,27 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#e30613">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+>
+
+<meta
+  name="theme-color"
+  content="#e30613"
+>
+
 <title>Hino Fun Run 2026 - Check-in</title>
 
-<script src="https://unpkg.com/html5-qrcode" defer></script>
-
 <style>
-*{box-sizing:border-box}
+
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
@@ -54,15 +66,24 @@ h1{
   text-align:center;
 }
 
-.stat.total{background:#e5e7eb}
-.stat.hadir{background:#dcfce7;color:#166534}
-.stat.belum{background:#fef3c7;color:#92400e}
+.stat.total{
+  background:#e5e7eb;
+}
+
+.stat.hadir{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.stat.belum{
+  background:#fef3c7;
+  color:#92400e;
+}
 
 .stat-number{
   font-size:24px;
   font-weight:800;
   line-height:1.1;
-  min-height:27px;
 }
 
 .stat-label{
@@ -89,7 +110,7 @@ h1{
 }
 
 #reader video{
-  width:100%!important;
+  width:100% !important;
   border-radius:12px;
 }
 
@@ -154,7 +175,7 @@ small{
   color:#6b7280;
   display:block;
   margin-top:10px;
-  line-height:1.4;
+  line-height:1.5;
 }
 
 .big{
@@ -162,12 +183,20 @@ small{
   font-weight:800;
   margin-bottom:8px;
 }
+
+.loading{
+  opacity:.7;
+}
+
 </style>
+
 </head>
+
 
 <body>
 
 <div class="wrap">
+
 <div class="card">
 
 <h1>Hino Fun Run 2026</h1>
@@ -177,33 +206,67 @@ CHECK-IN PESERTA — QR SCANNER
 </div>
 
 
-<!-- STATISTIK -->
+<!-- =====================================================
+     STATISTICS
+===================================================== -->
 
 <div class="stats">
 
 <div class="stat total">
-<div class="stat-number" id="totalPeserta">-</div>
-<div class="stat-label">TOTAL PESERTA</div>
+
+<div
+  class="stat-number"
+  id="totalPeserta"
+>-</div>
+
+<div class="stat-label">
+TOTAL PESERTA
 </div>
+
+</div>
+
 
 <div class="stat hadir">
-<div class="stat-number" id="totalHadir">-</div>
-<div class="stat-label">SUDAH CHECK-IN</div>
+
+<div
+  class="stat-number"
+  id="totalHadir"
+>-</div>
+
+<div class="stat-label">
+SUDAH CHECK-IN
 </div>
+
+</div>
+
 
 <div class="stat belum">
-<div class="stat-number" id="totalBelum">-</div>
-<div class="stat-label">BELUM CHECK-IN</div>
+
+<div
+  class="stat-number"
+  id="totalBelum"
+>-</div>
+
+<div class="stat-label">
+BELUM CHECK-IN
 </div>
 
 </div>
 
-<div class="refresh-info" id="refreshInfo">
+</div>
+
+
+<div
+  class="refresh-info"
+  id="refreshInfo"
+>
 Memuat statistik...
 </div>
 
 
-<!-- SCANNER -->
+<!-- =====================================================
+     SCANNER
+===================================================== -->
 
 <div id="reader"></div>
 
@@ -211,13 +274,20 @@ Memuat statistik...
 AKTIFKAN KAMERA
 </button>
 
-<div id="result" class="result">
-Siap. Tekan <b>AKTIFKAN KAMERA</b>,
+
+<div
+  id="result"
+  class="result"
+>
+Siap. Tekan
+<b>AKTIFKAN KAMERA</b>,
 izinkan kamera, lalu arahkan ke QR BIB.
 </div>
 
 
-<!-- MANUAL -->
+<!-- =====================================================
+     MANUAL
+===================================================== -->
 
 <div class="manual">
 
@@ -257,26 +327,39 @@ tanpa meninggalkan halaman web check-in.
 </div>
 
 </div>
+
 </div>
+
+
+<!-- =====================================================
+     QR SCANNER LIBRARY
+===================================================== -->
+
+<script
+  src="https://unpkg.com/html5-qrcode"
+></script>
 
 
 <script>
 
-// =========================================================
-// CONFIG
-// =========================================================
+/* =========================================================
+   CONFIG
+========================================================= */
 
 const APP_URL =
-"https://script.google.com/macros/s/AKfycbzAhqm744ZPESuxOcTzybAFfnLlU_r7Y6b2VOvogkoGTEiyO2B5an1bZ5AQW0_UsxGz/exec";
+  "https://script.google.com/macros/s/AKfycbzAhqm744ZPESuxOcTzybAFfnLlU_r7Y6b2VOvogkoGTEiyO2B5an1bZ5AQW0_UsxGz/exec";
 
 
 let scanner = null;
+
 let locked = false;
 
+let statsTimer = null;
 
-// =========================================================
-// FORMAT ANGKA
-// =========================================================
+
+/* =========================================================
+   FORMAT NUMBER
+========================================================= */
 
 function formatNumber(value){
 
@@ -286,33 +369,38 @@ function formatNumber(value){
 }
 
 
-// =========================================================
-// ESCAPE HTML
-// =========================================================
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
 
 function esc(value){
 
   return String(value || "")
-    .replace(/[&<>"']/g,function(m){
+    .replace(
+      /[&<>"']/g,
+      function(m){
 
-      return {
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#39;"
-      }[m];
+        return {
 
-    });
+          "&":"&amp;",
+          "<":"&lt;",
+          ">":"&gt;",
+          '"':"&quot;",
+          "'":"&#39;"
+
+        }[m];
+
+      }
+    );
 
 }
 
 
-// =========================================================
-// TAMPILKAN HASIL
-// =========================================================
+/* =========================================================
+   SHOW RESULT
+========================================================= */
 
-function show(message,cls=""){
+function show(message, cls=""){
 
   const el =
     document.getElementById("result");
@@ -326,141 +414,48 @@ function show(message,cls=""){
 }
 
 
-// =========================================================
-// JSONP
-// =========================================================
-
-function jsonp(url){
-
-  return new Promise(function(resolve,reject){
-
-    const callbackName =
-      "__hino_" +
-      Date.now() +
-      "_" +
-      Math.floor(Math.random()*100000);
-
-    const script =
-      document.createElement("script");
-
-    let finished = false;
-
-
-    function cleanup(){
-
-      delete window[callbackName];
-
-      if(script.parentNode){
-        script.parentNode.removeChild(script);
-      }
-
-    }
-
-
-    window[callbackName] =
-      function(data){
-
-        if(finished)return;
-
-        finished=true;
-
-        cleanup();
-
-        resolve(data);
-
-      };
-
-
-    script.onerror =
-      function(){
-
-        if(finished)return;
-
-        finished=true;
-
-        cleanup();
-
-        reject(
-          new Error(
-            "Gagal menghubungi server check-in."
-          )
-        );
-
-      };
-
-
-    script.src =
-      url +
-      (
-        url.indexOf("?") >= 0
-        ? "&"
-        : "?"
-      ) +
-      "callback=" +
-      encodeURIComponent(callbackName) +
-      "&t=" +
-      Date.now();
-
-
-    document.body.appendChild(script);
-
-
-    setTimeout(function(){
-
-      if(!finished){
-
-        finished=true;
-
-        cleanup();
-
-        reject(
-          new Error(
-            "Server tidak merespons."
-          )
-        );
-
-      }
-
-    },15000);
-
-  });
-
-}
-
-
-// =========================================================
-// UPDATE STATISTIK
-// =========================================================
+/* =========================================================
+   UPDATE STATISTICS
+========================================================= */
 
 function updateStats(data){
 
-  if(!data || data.ok !== true){
+  if(
+    !data ||
+    data.ok !== true
+  ){
 
-    document.getElementById("refreshInfo")
-      .textContent =
+    document.getElementById(
+      "refreshInfo"
+    ).textContent =
       "Gagal memuat statistik.";
 
     return;
+
   }
 
 
-  document.getElementById("totalPeserta")
-    .textContent =
+  document.getElementById(
+    "totalPeserta"
+  ).textContent =
     formatNumber(data.total);
 
 
-  document.getElementById("totalHadir")
-    .textContent =
+  document.getElementById(
+    "totalHadir"
+  ).textContent =
     formatNumber(data.hadir);
 
 
-  document.getElementById("totalBelum")
-    .textContent =
+  document.getElementById(
+    "totalBelum"
+  ).textContent =
     formatNumber(data.belum);
 
 
-  document.getElementById("refreshInfo")
-    .textContent =
+  document.getElementById(
+    "refreshInfo"
+  ).textContent =
     "Statistik diperbarui: " +
     new Date().toLocaleTimeString(
       "id-ID",
@@ -474,9 +469,141 @@ function updateStats(data){
 }
 
 
-// =========================================================
-// LOAD STATISTIK
-// =========================================================
+/* =========================================================
+   JSONP
+========================================================= */
+
+function jsonp(url){
+
+  return new Promise(
+    function(resolve,reject){
+
+      const callbackName =
+        "__hino_" +
+        Date.now() +
+        "_" +
+        Math.floor(
+          Math.random() * 100000
+        );
+
+
+      const script =
+        document.createElement("script");
+
+
+      let finished = false;
+
+
+      function cleanup(){
+
+        try{
+          delete window[
+            callbackName
+          ];
+        }
+        catch(e){}
+
+
+        if(
+          script.parentNode
+        ){
+
+          script.parentNode
+            .removeChild(script);
+
+        }
+
+      }
+
+
+      window[
+        callbackName
+      ] =
+        function(data){
+
+          if(finished)
+            return;
+
+          finished = true;
+
+          cleanup();
+
+          resolve(data);
+
+        };
+
+
+      script.onerror =
+        function(){
+
+          if(finished)
+            return;
+
+          finished = true;
+
+          cleanup();
+
+          reject(
+            new Error(
+              "Gagal menghubungi server check-in."
+            )
+          );
+
+        };
+
+
+      const separator =
+        url.indexOf("?") >= 0
+          ? "&"
+          : "?";
+
+
+      script.src =
+        url +
+        separator +
+        "callback=" +
+        encodeURIComponent(
+          callbackName
+        ) +
+        "&t=" +
+        Date.now();
+
+
+      document.body.appendChild(
+        script
+      );
+
+
+      setTimeout(
+        function(){
+
+          if(!finished){
+
+            finished = true;
+
+            cleanup();
+
+            reject(
+              new Error(
+                "Server tidak merespons."
+              )
+            );
+
+          }
+
+        },
+        15000
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   LOAD STATISTICS
+========================================================= */
 
 async function loadStats(){
 
@@ -484,8 +611,10 @@ async function loadStats(){
 
     const data =
       await jsonp(
-        APP_URL + "?action=stats"
+        APP_URL +
+        "?action=stats"
       );
+
 
     updateStats(data);
 
@@ -493,9 +622,10 @@ async function loadStats(){
   catch(error){
 
     console.error(
-      "Stats error:",
+      "Statistics error:",
       error
     );
+
 
     document.getElementById(
       "refreshInfo"
@@ -507,40 +637,24 @@ async function loadStats(){
 }
 
 
-// =========================================================
-// VALIDASI BIB
-// =========================================================
-//
-// M = Male
-// F = Female
-// H = Hino
-// S = Staff
-// P = Partner
-// I = Internal
-//
-// Format umum:
-// X26001
-//
-// Database Google Sheet tetap menjadi
-// penentu apakah BIB tersebut benar-benar ada.
-// =========================================================
+/* =========================================================
+   VALIDATE BIB
+========================================================= */
 
 function isValidBib(bib){
 
-  bib =
-    String(bib || "")
-      .trim()
-      .toUpperCase();
-
-
-  return /^[MFHSPI]\d{5}$/.test(bib);
+  return /^[MFHSPI]\d{5}$/i
+    .test(
+      String(bib || "")
+        .trim()
+    );
 
 }
 
 
-// =========================================================
-// EXTRACT BIB DARI QR
-// =========================================================
+/* =========================================================
+   EXTRACT BIB FROM QR
+========================================================= */
 
 function extractBib(text){
 
@@ -549,14 +663,33 @@ function extractBib(text){
       .trim();
 
 
-  if(!text){
-    return "";
+  /*
+   * 1.
+   * QR langsung berisi:
+   *
+   * H26037
+   * M26001
+   * F26001
+   */
+
+  if(
+    isValidBib(text)
+  ){
+
+    return text
+      .toUpperCase();
+
   }
 
 
-  // -------------------------------------------------------
-  // 1. QR BERISI URL
-  // -------------------------------------------------------
+  /*
+   * 2.
+   * QR berisi URL:
+   *
+   * ?b=H26037
+   *
+   * ?bib=H26037
+   */
 
   try{
 
@@ -564,130 +697,47 @@ function extractBib(text){
       new URL(text);
 
 
-    const params =
-      url.searchParams;
+    const bib =
+      url.searchParams.get("b") ||
+      url.searchParams.get("bib");
 
 
-    const candidates = [
-
-      params.get("b"),
-
-      params.get("bib"),
-
-      params.get("BIB"),
-
-      params.get("B")
-
-    ];
-
-
-    for(
-      let i=0;
-      i<candidates.length;
-      i++
+    if(
+      bib &&
+      isValidBib(bib)
     ){
 
-      const value =
-        String(
-          candidates[i] || ""
-        )
+      return bib
         .trim()
         .toUpperCase();
 
-
-      if(
-        isValidBib(value)
-      ){
-
-        return value;
-
-      }
-
     }
 
   }
-  catch(error){
-
-    // Bukan URL.
-    // Lanjut ke pemeriksaan berikutnya.
-
-  }
+  catch(e){}
 
 
-  // -------------------------------------------------------
-  // 2. CARI ?b=H26037 / ?bib=H26037
-  // -------------------------------------------------------
+  /*
+   * 3.
+   * BACKUP PALING ROBUST
+   *
+   * Cari pola BIB di dalam
+   * seluruh isi QR.
+   */
 
-  const queryMatch =
+  const match =
     text.match(
-      /(?:\?|&)(?:b|bib)=([A-Za-z0-9_-]+)/i
+      /(?:^|[^A-Z0-9])([MFHSPI]\d{5})(?:[^A-Z0-9]|$)/i
     );
-
-
-  if(queryMatch){
-
-    const value =
-      String(
-        queryMatch[1] || ""
-      )
-      .trim()
-      .toUpperCase();
-
-
-    if(
-      isValidBib(value)
-    ){
-
-      return value;
-
-    }
-
-  }
-
-
-  // -------------------------------------------------------
-  // 3. QR LANGSUNG BERISI BIB
-  // -------------------------------------------------------
-
-  const direct =
-    text
-      .replace(/\s+/g,"")
-      .toUpperCase();
 
 
   if(
-    isValidBib(direct)
+    match &&
+    isValidBib(match[1])
   ){
 
-    return direct;
-
-  }
-
-
-  // -------------------------------------------------------
-  // 4. BIB BERADA DI DALAM TEKS QR
-  // -------------------------------------------------------
-
-  const embedded =
-    text.match(
-      /\b([MFHSPI]\d{5})\b/i
-    );
-
-
-  if(embedded){
-
-    const value =
-      embedded[1]
-        .toUpperCase();
-
-
-    if(
-      isValidBib(value)
-    ){
-
-      return value;
-
-    }
+    return match[1]
+      .toUpperCase();
 
   }
 
@@ -697,9 +747,9 @@ function extractBib(text){
 }
 
 
-// =========================================================
-// PROSES CHECK-IN
-// =========================================================
+/* =========================================================
+   PROCESS CHECK-IN
+========================================================= */
 
 async function processCheckin(
   bib,
@@ -712,21 +762,19 @@ async function processCheckin(
       .toUpperCase();
 
 
-  if(!bib){
-    locked=false;
+  if(!bib)
     return;
-  }
+
+
+  show(
+    "Memproses BIB <b>" +
+    esc(bib) +
+    "</b>...",
+    ""
+  );
 
 
   try{
-
-    show(
-      "Memproses BIB <b>" +
-      esc(bib) +
-      "</b>...",
-      ""
-    );
-
 
     const url =
       APP_URL +
@@ -735,7 +783,7 @@ async function processCheckin(
       encodeURIComponent(bib) +
       "&officer=" +
       encodeURIComponent(
-        officer || "QR-CAMERA"
+        officer || "MANUAL"
       );
 
 
@@ -749,9 +797,9 @@ async function processCheckin(
     );
 
 
-    // -----------------------------------------------------
-    // BERHASIL
-    // -----------------------------------------------------
+    /* =====================================================
+       SUCCESS
+    ===================================================== */
 
     if(
       data &&
@@ -789,29 +837,33 @@ async function processCheckin(
       );
 
 
-      loadStats();
+      await loadStats();
 
 
-      setTimeout(function(){
+      setTimeout(
+        function(){
 
-        locked=false;
+          locked = false;
 
-        show(
-          "Kamera aktif. " +
-          "Silakan scan BIB berikutnya.",
-          ""
-        );
+          show(
+            "Kamera aktif. " +
+            "Silakan scan BIB berikutnya.",
+            ""
+          );
 
-      },2500);
+        },
+        2000
+      );
 
 
       return;
+
     }
 
 
-    // -----------------------------------------------------
-    // DUPLICATE
-    // -----------------------------------------------------
+    /* =====================================================
+       DUPLICATE
+    ===================================================== */
 
     if(
       data &&
@@ -840,7 +892,7 @@ async function processCheckin(
         esc(data.size) +
         "</div>" +
 
-        "<div><b>Waktu sebelumnya:</b> " +
+        "<div>Waktu sebelumnya: " +
         esc(data.previousTime) +
         "</div>",
 
@@ -849,29 +901,33 @@ async function processCheckin(
       );
 
 
-      loadStats();
+      await loadStats();
 
 
-      setTimeout(function(){
+      setTimeout(
+        function(){
 
-        locked=false;
+          locked = false;
 
-        show(
-          "Kamera aktif. " +
-          "Silakan scan BIB berikutnya.",
-          ""
-        );
+          show(
+            "Kamera aktif. " +
+            "Silakan scan BIB berikutnya.",
+            ""
+          );
 
-      },2500);
+        },
+        2000
+      );
 
 
       return;
+
     }
 
 
-    // -----------------------------------------------------
-    // BIB TIDAK DITEMUKAN / ERROR
-    // -----------------------------------------------------
+    /* =====================================================
+       NOT FOUND / INVALID / ERROR
+    ===================================================== */
 
     show(
 
@@ -882,8 +938,8 @@ async function processCheckin(
       "<div>" +
       esc(
         data && data.message
-        ? data.message
-        : "Terjadi kesalahan."
+          ? data.message
+          : "BIB tidak dapat diproses."
       ) +
       "</div>",
 
@@ -892,7 +948,7 @@ async function processCheckin(
     );
 
 
-    locked=false;
+    locked = false;
 
   }
   catch(error){
@@ -918,22 +974,21 @@ async function processCheckin(
     );
 
 
-    locked=false;
+    locked = false;
 
   }
 
 }
 
 
-// =========================================================
-// START CAMERA
-// =========================================================
+/* =========================================================
+   START CAMERA
+========================================================= */
 
 async function startScanner(){
 
-  if(scanner){
+  if(scanner)
     return;
-  }
 
 
   if(
@@ -958,7 +1013,7 @@ async function startScanner(){
     );
 
 
-  reader.innerHTML="";
+  reader.innerHTML = "";
 
 
   scanner =
@@ -995,9 +1050,8 @@ async function startScanner(){
 
       function(decodedText){
 
-        if(locked){
+        if(locked)
           return;
-        }
 
 
         console.log(
@@ -1012,10 +1066,6 @@ async function startScanner(){
           );
 
 
-        // -------------------------------------------------
-        // QR TIDAK MENGANDUNG BIB
-        // -------------------------------------------------
-
         if(!bib){
 
           show(
@@ -1026,13 +1076,10 @@ async function startScanner(){
 
             "<div>" +
             "QR berhasil dibaca, tetapi " +
-            "nomor BIB tidak ditemukan." +
+            "BIB tidak ditemukan di dalam QR." +
             "</div>" +
 
-            "<br>" +
-
-            "<div style='font-size:13px;word-break:break-all'>" +
-            "<b>Isi QR:</b><br>" +
+            "<div style='margin-top:8px;font-size:13px'>" +
             esc(decodedText) +
             "</div>",
 
@@ -1045,11 +1092,7 @@ async function startScanner(){
         }
 
 
-        // -------------------------------------------------
-        // BIB DITEMUKAN
-        // -------------------------------------------------
-
-        locked=true;
+        locked = true;
 
 
         processCheckin(
@@ -1060,10 +1103,9 @@ async function startScanner(){
       },
 
 
-      function(){
+      function(errorMessage){
 
-        // Jangan tampilkan error scanner
-        // saat kamera sedang mencari QR.
+        /* Ignore scanning frame errors */
 
       }
 
@@ -1091,16 +1133,18 @@ async function startScanner(){
     );
 
 
-    scanner=null;
+    scanner = null;
 
 
     show(
 
       "<b>Kamera tidak dapat diaktifkan.</b>" +
-
       "<br><br>" +
 
-      "Pastikan izin kamera diberikan.",
+      "Pastikan izin kamera diberikan. " +
+
+      "Jika tetap gagal, gunakan " +
+      "input BIB manual.",
 
       "err"
 
@@ -1111,9 +1155,9 @@ async function startScanner(){
 }
 
 
-// =========================================================
-// BUTTON KAMERA
-// =========================================================
+/* =========================================================
+   CAMERA BUTTON
+========================================================= */
 
 document
   .getElementById("startBtn")
@@ -1123,9 +1167,9 @@ document
   );
 
 
-// =========================================================
-// BUTTON MANUAL
-// =========================================================
+/* =========================================================
+   MANUAL CHECK-IN
+========================================================= */
 
 document
   .getElementById("manualBtn")
@@ -1133,9 +1177,8 @@ document
     "click",
     function(){
 
-      if(locked){
+      if(locked)
         return;
-      }
 
 
       const input =
@@ -1157,21 +1200,21 @@ document
         show(
 
           "<div class='big'>" +
-          "✕ FORMAT BIB TIDAK VALID" +
+          "✕ FORMAT BIB SALAH" +
           "</div>" +
 
           "<div>" +
-          "Gunakan format huruf + 5 digit." +
+          "Format yang diterima:" +
           "</div>" +
 
-          "<br>" +
-
+          "<div style='margin-top:8px'>" +
           "<b>M26001</b> / " +
           "<b>F26001</b> / " +
           "<b>H26001</b> / " +
           "<b>S26001</b> / " +
           "<b>P26001</b> / " +
-          "<b>I26001</b>",
+          "<b>I26001</b>" +
+          "</div>",
 
           "warn"
 
@@ -1185,10 +1228,10 @@ document
       }
 
 
-      locked=true;
+      locked = true;
 
 
-      input.value="";
+      input.value = "";
 
 
       processCheckin(
@@ -1200,9 +1243,9 @@ document
   );
 
 
-// =========================================================
-// ENTER
-// =========================================================
+/* =========================================================
+   ENTER KEY
+========================================================= */
 
 document
   .getElementById("manualBib")
@@ -1226,19 +1269,21 @@ document
   );
 
 
-// =========================================================
-// INITIAL
-// =========================================================
+/* =========================================================
+   INITIAL LOAD
+========================================================= */
 
 loadStats();
 
 
-setInterval(
-  loadStats,
-  5000
-);
+statsTimer =
+  setInterval(
+    loadStats,
+    5000
+  );
 
 </script>
 
 </body>
+
 </html>
