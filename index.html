@@ -119,6 +119,11 @@ h1{
   border:2px solid #ddd;
 }
 
+#reader video{
+  width:100% !important;
+  border-radius:12px;
+}
+
 button{
   width:100%;
   border:0;
@@ -189,11 +194,6 @@ small{
   margin-bottom:8px;
 }
 
-#reader video{
-  width:100% !important;
-  border-radius:12px;
-}
-
 </style>
 
 </head>
@@ -221,49 +221,49 @@ CHECK-IN PESERTA — QR SCANNER
 
 <div class="stats">
 
-  <div class="stat total">
+<div class="stat total">
 
-    <div
-      class="stat-number"
-      id="totalPeserta">
-      -
-    </div>
+<div
+  class="stat-number"
+  id="totalPeserta">
+-
+</div>
 
-    <div class="stat-label">
-      TOTAL PESERTA
-    </div>
+<div class="stat-label">
+TOTAL PESERTA
+</div>
 
-  </div>
-
-
-  <div class="stat hadir">
-
-    <div
-      class="stat-number"
-      id="totalHadir">
-      -
-    </div>
-
-    <div class="stat-label">
-      SUDAH CHECK-IN
-    </div>
-
-  </div>
+</div>
 
 
-  <div class="stat belum">
+<div class="stat hadir">
 
-    <div
-      class="stat-number"
-      id="totalBelum">
-      -
-    </div>
+<div
+  class="stat-number"
+  id="totalHadir">
+-
+</div>
 
-    <div class="stat-label">
-      BELUM CHECK-IN
-    </div>
+<div class="stat-label">
+SUDAH CHECK-IN
+</div>
 
-  </div>
+</div>
+
+
+<div class="stat belum">
+
+<div
+  class="stat-number"
+  id="totalBelum">
+-
+</div>
+
+<div class="stat-label">
+BELUM CHECK-IN
+</div>
+
+</div>
 
 </div>
 
@@ -271,19 +271,19 @@ CHECK-IN PESERTA — QR SCANNER
 <div
   class="refresh-info"
   id="refreshInfo">
-  Memuat statistik...
+Memuat statistik...
 </div>
 
 
 <!-- =====================================================
-     QR SCANNER
+     SCANNER
 ===================================================== -->
 
 <div id="reader"></div>
 
 
 <button id="startBtn">
-  AKTIFKAN KAMERA
+AKTIFKAN KAMERA
 </button>
 
 
@@ -291,9 +291,9 @@ CHECK-IN PESERTA — QR SCANNER
   id="result"
   class="result">
 
-  Siap. Tekan
-  <b>AKTIFKAN KAMERA</b>,
-  izinkan kamera, lalu arahkan ke QR BIB.
+Siap. Tekan
+<b>AKTIFKAN KAMERA</b>,
+izinkan kamera, lalu arahkan ke QR BIB.
 
 </div>
 
@@ -304,28 +304,38 @@ CHECK-IN PESERTA — QR SCANNER
 
 <div class="manual">
 
-  <b>
-    Backup: input BIB manual
-  </b>
+<b>
+Backup: input BIB manual
+</b>
 
 
-  <input
-    id="manualBib"
-    placeholder="Contoh: M26001"
-    autocomplete="off"
-    maxlength="6"
-  >
+<input
+  id="manualBib"
+  placeholder="Contoh: M26001 / H26037"
+  autocomplete="off"
+  maxlength="6"
+>
 
 
-  <button id="manualBtn">
-    CHECK-IN MANUAL
-  </button>
+<button id="manualBtn">
+CHECK-IN MANUAL
+</button>
 
 
-  <small>
-    QR maupun BIB manual diproses langsung
-    tanpa meninggalkan halaman web check-in.
-  </small>
+<small>
+
+Format yang didukung:
+
+M / F / H / S / P / I
+
+Contoh:
+M26001, F26001, H26037,
+S26018, P26023, I26020.
+
+QR maupun BIB manual diproses
+tanpa meninggalkan halaman web check-in.
+
+</small>
 
 </div>
 
@@ -393,13 +403,18 @@ function esc(value){
 
 
 /* =========================================================
-   TAMPILKAN HASIL
+   SHOW RESULT
 ========================================================= */
 
-function show(message, cls=""){
+function show(
+  message,
+  cls=""
+){
 
   const el =
-    document.getElementById("result");
+    document.getElementById(
+      "result"
+    );
 
   el.className =
     "result " + cls;
@@ -411,7 +426,7 @@ function show(message, cls=""){
 
 
 /* =========================================================
-   UPDATE STATISTIK
+   UPDATE STATISTICS
 ========================================================= */
 
 function updateStats(data){
@@ -434,19 +449,25 @@ function updateStats(data){
   document.getElementById(
     "totalPeserta"
   ).textContent =
-    formatNumber(data.total);
+    formatNumber(
+      data.total
+    );
 
 
   document.getElementById(
     "totalHadir"
   ).textContent =
-    formatNumber(data.hadir);
+    formatNumber(
+      data.hadir
+    );
 
 
   document.getElementById(
     "totalBelum"
   ).textContent =
-    formatNumber(data.belum);
+    formatNumber(
+      data.belum
+    );
 
 
   document.getElementById(
@@ -466,20 +487,23 @@ function updateStats(data){
 
 
 /* =========================================================
-   JSONP
+   JSONP REQUEST
 ========================================================= */
 
 function jsonp(url){
 
   return new Promise(
-    function(resolve,reject){
+    function(
+      resolve,
+      reject
+    ){
 
       const callbackName =
         "__hino_" +
         Date.now() +
         "_" +
         Math.floor(
-          Math.random()*100000
+          Math.random() * 100000
         );
 
 
@@ -524,7 +548,9 @@ function jsonp(url){
 
           cleanup();
 
-          resolve(data);
+          resolve(
+            data
+          );
 
         };
 
@@ -595,7 +621,7 @@ function jsonp(url){
 
 
 /* =========================================================
-   LOAD STATISTIK
+   LOAD STATISTICS
 ========================================================= */
 
 async function loadStats(){
@@ -609,7 +635,9 @@ async function loadStats(){
       );
 
 
-    updateStats(data);
+    updateStats(
+      data
+    );
 
   }
   catch(error){
@@ -631,40 +659,64 @@ async function loadStats(){
 
 
 /* =========================================================
-   EXTRACT BIB
+   VALIDASI BIB
 ========================================================= */
 
-function extractBib(text){
+function isValidBib(
+  bib
+){
+
+  return /^[MFHSPI]\d{5}$/i
+    .test(
+      bib
+    );
+
+}
+
+
+/* =========================================================
+   EXTRACT BIB DARI QR
+========================================================= */
+
+function extractBib(
+  text
+){
 
   text =
-    String(text || "")
-      .trim();
+    String(
+      text || ""
+    )
+    .trim();
 
 
   /*
-   * =====================================================
-   * SUPPORT URL:
+   * URL:
    *
-   * ?b=M26001
-   * ?bib=M26001
+   * ?b=H26037
    *
-   * =====================================================
+   * ?bib=H26037
    */
 
   try{
 
     const url =
-      new URL(text);
+      new URL(
+        text
+      );
 
 
     const bib =
-      url.searchParams.get("b") ||
-      url.searchParams.get("bib");
+      url.searchParams.get(
+        "b"
+      ) ||
+      url.searchParams.get(
+        "bib"
+      );
 
 
     if(
       bib &&
-      /^[MF]\d{5}$/i.test(
+      isValidBib(
         bib.trim()
       )
     ){
@@ -680,9 +732,7 @@ function extractBib(text){
 
 
   /*
-   * =====================================================
-   * BACKUP PARSING
-   * =====================================================
+   * BACKUP
    */
 
   const match =
@@ -693,7 +743,7 @@ function extractBib(text){
 
   if(
     match &&
-    /^[MF]\d{5}$/i.test(
+    isValidBib(
       match[1]
     )
   ){
@@ -705,16 +755,16 @@ function extractBib(text){
 
 
   /*
-   * =====================================================
-   * QR LANGSUNG BERISI BIB
+   * QR langsung:
    *
-   * M26001
-   * F26001
-   * =====================================================
+   * H26037
+   * S26001
+   * P26001
+   * I26001
    */
 
   if(
-    /^[MF]\d{5}$/i.test(
+    isValidBib(
       text
     )
   ){
@@ -764,25 +814,30 @@ async function processCheckin(
       ) +
       "&officer=" +
       encodeURIComponent(
-        officer || "QR-CAMERA"
+        officer ||
+        "QR-CAMERA"
       );
 
 
     const data =
-      await jsonp(url);
+      await jsonp(
+        url
+      );
 
 
     console.log(
-      "CHECK-IN:",
+      "CHECK-IN RESULT:",
       data
     );
 
 
     /* =====================================================
-       SUCCESS
+       BERHASIL
     ===================================================== */
 
-    if(data.ok){
+    if(
+      data.ok
+    ){
 
       show(
 
@@ -818,10 +873,16 @@ async function processCheckin(
       loadStats();
 
 
+      /*
+       * Setelah 2,5 detik
+       * scanner siap untuk peserta berikutnya.
+       */
+
       setTimeout(
         function(){
 
           locked = false;
+
 
           show(
             "Kamera aktif. " +
@@ -870,7 +931,7 @@ async function processCheckin(
         esc(data.size) +
         "</div>" +
 
-        "<div>Waktu check-in sebelumnya: " +
+        "<div>Waktu sebelumnya: " +
         esc(data.previousTime) +
         "</div>",
 
@@ -886,6 +947,7 @@ async function processCheckin(
         function(){
 
           locked = false;
+
 
           show(
             "Kamera aktif. " +
@@ -904,7 +966,7 @@ async function processCheckin(
 
 
     /* =====================================================
-       BIB TIDAK DITEMUKAN / ERROR
+       GAGAL
     ===================================================== */
 
     show(
@@ -1023,14 +1085,16 @@ async function startScanner(){
     await scanner.start(
 
       {
-        facingMode:"environment"
+        facingMode:
+          "environment"
       },
 
       config,
 
       function(decodedText){
 
-        if(locked) return;
+        if(locked)
+          return;
 
 
         console.log(
@@ -1066,9 +1130,7 @@ async function startScanner(){
 
 
         /*
-         * KUNCI SCANNER
-         * supaya satu QR tidak
-         * diproses berkali-kali
+         * KUNCI
          */
 
         locked = true;
@@ -1116,8 +1178,8 @@ async function startScanner(){
 
       "Pastikan izin kamera diberikan. " +
 
-      "Jika tetap gagal, gunakan input " +
-      "BIB manual.",
+      "Jika tetap gagal, gunakan " +
+      "input BIB manual.",
 
       "err"
 
@@ -1129,7 +1191,7 @@ async function startScanner(){
 
 
 /* =========================================================
-   BUTTON KAMERA
+   BUTTON CAMERA
 ========================================================= */
 
 document
@@ -1154,7 +1216,8 @@ document
     "click",
     function(){
 
-      if(locked) return;
+      if(locked)
+        return;
 
 
       const input =
@@ -1170,17 +1233,23 @@ document
 
 
       if(
-        !/^[MF]\d{5}$/.test(
+        !isValidBib(
           bib
         )
       ){
 
         show(
 
-          "Format BIB tidak valid.<br>" +
+          "Format BIB tidak valid.<br><br>" +
 
-          "Contoh: <b>M26001</b> " +
-          "atau <b>F26001</b>.",
+          "Format yang diterima:<br>" +
+
+          "<b>M26001</b> / " +
+          "<b>F26001</b> / " +
+          "<b>H26001</b> / " +
+          "<b>S26001</b> / " +
+          "<b>P26001</b> / " +
+          "<b>I26001</b>",
 
           "warn"
 
@@ -1210,7 +1279,7 @@ document
 
 
 /* =========================================================
-   ENTER PADA INPUT MANUAL
+   ENTER
 ========================================================= */
 
 document
@@ -1222,7 +1291,8 @@ document
     function(e){
 
       if(
-        e.key === "Enter"
+        e.key ===
+        "Enter"
       ){
 
         document
