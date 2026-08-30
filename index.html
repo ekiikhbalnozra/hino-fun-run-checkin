@@ -15,9 +15,8 @@
   content="#e30613"
 >
 
-<title>
-Hino Fun Run 2026 - Check-in
-</title>
+<title>Hino Fun Run 2026 - Check-in</title>
+
 
 <script
   src="https://unpkg.com/html5-qrcode"
@@ -328,9 +327,14 @@ Format yang didukung:
 
 M / F / H / S / P / I
 
+<br><br>
+
 Contoh:
+
 M26001, F26001, H26037,
 S26018, P26023, I26020.
+
+<br><br>
 
 QR maupun BIB manual diproses
 tanpa meninggalkan halaman web check-in.
@@ -348,9 +352,9 @@ tanpa meninggalkan halaman web check-in.
 <script>
 
 
-/* =========================================================
-   CONFIG
-========================================================= */
+// =========================================================
+// CONFIG
+// =========================================================
 
 const APP_URL =
   "https://script.google.com/macros/s/AKfycbzAhqm744ZPESuxOcTzybAFfnLlU_r7Y6b2VOvogkoGTEiyO2B5an1bZ5AQW0_UsxGz/exec";
@@ -363,9 +367,9 @@ let locked = false;
 let statsTimer = null;
 
 
-/* =========================================================
-   FORMAT ANGKA
-========================================================= */
+// =========================================================
+// FORMAT ANGKA
+// =========================================================
 
 function formatNumber(value){
 
@@ -375,9 +379,9 @@ function formatNumber(value){
 }
 
 
-/* =========================================================
-   ESCAPE HTML
-========================================================= */
+// =========================================================
+// ESCAPE HTML
+// =========================================================
 
 function esc(value){
 
@@ -402,19 +406,14 @@ function esc(value){
 }
 
 
-/* =========================================================
-   SHOW RESULT
-========================================================= */
+// =========================================================
+// SHOW RESULT
+// =========================================================
 
-function show(
-  message,
-  cls=""
-){
+function show(message, cls=""){
 
   const el =
-    document.getElementById(
-      "result"
-    );
+    document.getElementById("result");
 
   el.className =
     "result " + cls;
@@ -425,9 +424,9 @@ function show(
 }
 
 
-/* =========================================================
-   UPDATE STATISTICS
-========================================================= */
+// =========================================================
+// UPDATE STATISTICS
+// =========================================================
 
 function updateStats(data){
 
@@ -486,17 +485,14 @@ function updateStats(data){
 }
 
 
-/* =========================================================
-   JSONP REQUEST
-========================================================= */
+// =========================================================
+// JSONP
+// =========================================================
 
 function jsonp(url){
 
   return new Promise(
-    function(
-      resolve,
-      reject
-    ){
+    function(resolve,reject){
 
       const callbackName =
         "__hino_" +
@@ -542,15 +538,14 @@ function jsonp(url){
       ] =
         function(data){
 
-          if(finished) return;
+          if(finished)
+            return;
 
           finished = true;
 
           cleanup();
 
-          resolve(
-            data
-          );
+          resolve(data);
 
         };
 
@@ -558,7 +553,8 @@ function jsonp(url){
       script.onerror =
         function(){
 
-          if(finished) return;
+          if(finished)
+            return;
 
           finished = true;
 
@@ -620,9 +616,9 @@ function jsonp(url){
 }
 
 
-/* =========================================================
-   LOAD STATISTICS
-========================================================= */
+// =========================================================
+// LOAD STATISTICS
+// =========================================================
 
 async function loadStats(){
 
@@ -658,13 +654,11 @@ async function loadStats(){
 }
 
 
-/* =========================================================
-   VALIDASI BIB
-========================================================= */
+// =========================================================
+// VALIDASI BIB
+// =========================================================
 
-function isValidBib(
-  bib
-){
+function isValidBib(bib){
 
   return /^[MFHSPI]\d{5}$/i
     .test(
@@ -674,28 +668,20 @@ function isValidBib(
 }
 
 
-/* =========================================================
-   EXTRACT BIB DARI QR
-========================================================= */
+// =========================================================
+// EXTRACT BIB DARI QR
+// =========================================================
 
-function extractBib(
-  text
-){
+function extractBib(text){
 
   text =
-    String(
-      text || ""
-    )
-    .trim();
+    String(text || "")
+      .trim();
 
 
-  /*
-   * URL:
-   *
-   * ?b=H26037
-   *
-   * ?bib=H26037
-   */
+  // -------------------------------------------------------
+  // QR berupa URL
+  // -------------------------------------------------------
 
   try{
 
@@ -706,12 +692,8 @@ function extractBib(
 
 
     const bib =
-      url.searchParams.get(
-        "b"
-      ) ||
-      url.searchParams.get(
-        "bib"
-      );
+      url.searchParams.get("b") ||
+      url.searchParams.get("bib");
 
 
     if(
@@ -731,9 +713,15 @@ function extractBib(
   catch(e){}
 
 
-  /*
-   * BACKUP
-   */
+  // -------------------------------------------------------
+  // BACKUP REGEX
+  // Mendukung:
+  //
+  // ?b=H26037
+  // ?bib=H26037
+  // &b=H26037
+  // &bib=H26037
+  // -------------------------------------------------------
 
   const match =
     text.match(
@@ -754,14 +742,9 @@ function extractBib(
   }
 
 
-  /*
-   * QR langsung:
-   *
-   * H26037
-   * S26001
-   * P26001
-   * I26001
-   */
+  // -------------------------------------------------------
+  // QR langsung hanya berisi BIB
+  // -------------------------------------------------------
 
   if(
     isValidBib(
@@ -775,21 +758,46 @@ function extractBib(
   }
 
 
+  // -------------------------------------------------------
+  // BACKUP:
+  // cari BIB di dalam teks QR
+  // -------------------------------------------------------
+
+  const bibMatch =
+    text.match(
+      /\b([MFHSPI]\d{5})\b/i
+    );
+
+
+  if(
+    bibMatch &&
+    isValidBib(
+      bibMatch[1]
+    )
+  ){
+
+    return bibMatch[1]
+      .toUpperCase();
+
+  }
+
+
   return "";
 
 }
 
 
-/* =========================================================
-   PROSES CHECK-IN
-========================================================= */
+// =========================================================
+// PROSES CHECK-IN
+// =========================================================
 
 async function processCheckin(
   bib,
   officer
 ){
 
-  if(!bib) return;
+  if(!bib)
+    return;
 
 
   try{
@@ -814,8 +822,7 @@ async function processCheckin(
       ) +
       "&officer=" +
       encodeURIComponent(
-        officer ||
-        "QR-CAMERA"
+        officer || "QR-CAMERA"
       );
 
 
@@ -831,12 +838,13 @@ async function processCheckin(
     );
 
 
-    /* =====================================================
-       BERHASIL
-    ===================================================== */
+    // =====================================================
+    // SUCCESS
+    // =====================================================
 
     if(
-      data.ok
+      data &&
+      data.ok === true
     ){
 
       show(
@@ -873,16 +881,13 @@ async function processCheckin(
       loadStats();
 
 
-      /*
-       * Setelah 2,5 detik
-       * scanner siap untuk peserta berikutnya.
-       */
+      // Scanner tetap hidup.
+      // Setelah 2,5 detik siap scan berikutnya.
 
       setTimeout(
         function(){
 
           locked = false;
-
 
           show(
             "Kamera aktif. " +
@@ -900,13 +905,13 @@ async function processCheckin(
     }
 
 
-    /* =====================================================
-       DUPLICATE
-    ===================================================== */
+    // =====================================================
+    // DUPLICATE
+    // =====================================================
 
     if(
-      data.type ===
-      "DUPLICATE"
+      data &&
+      data.type === "DUPLICATE"
     ){
 
       show(
@@ -931,7 +936,7 @@ async function processCheckin(
         esc(data.size) +
         "</div>" +
 
-        "<div>Waktu sebelumnya: " +
+        "<div><b>Waktu sebelumnya:</b> " +
         esc(data.previousTime) +
         "</div>",
 
@@ -947,7 +952,6 @@ async function processCheckin(
         function(){
 
           locked = false;
-
 
           show(
             "Kamera aktif. " +
@@ -965,9 +969,9 @@ async function processCheckin(
     }
 
 
-    /* =====================================================
-       GAGAL
-    ===================================================== */
+    // =====================================================
+    // NOT FOUND / ERROR
+    // =====================================================
 
     show(
 
@@ -977,8 +981,10 @@ async function processCheckin(
 
       "<div>" +
       esc(
-        data.message ||
-        "Terjadi kesalahan."
+        data &&
+        data.message
+          ? data.message
+          : "Terjadi kesalahan."
       ) +
       "</div>",
 
@@ -1023,13 +1029,14 @@ async function processCheckin(
 }
 
 
-/* =========================================================
-   START CAMERA
-========================================================= */
+// =========================================================
+// START CAMERA
+// =========================================================
 
 async function startScanner(){
 
-  if(scanner) return;
+  if(scanner)
+    return;
 
 
   if(
@@ -1038,12 +1045,9 @@ async function startScanner(){
   ){
 
     show(
-
       "Scanner belum siap. " +
       "Refresh halaman lalu coba lagi.",
-
       "err"
-
     );
 
     return;
@@ -1114,11 +1118,13 @@ async function startScanner(){
           show(
 
             "QR terbaca, tetapi format BIB " +
-            "tidak dikenali:<br><br>" +
+            "tidak dikenali." +
 
-            "<b>" +
-            esc(decodedText) +
-            "</b>",
+            "<br><br>" +
+
+            "<b>Isi QR:</b><br>" +
+
+            esc(decodedText),
 
             "warn"
 
@@ -1129,9 +1135,9 @@ async function startScanner(){
         }
 
 
-        /*
-         * KUNCI
-         */
+        // =================================================
+        // KUNCI SEBELUM REQUEST
+        // =================================================
 
         locked = true;
 
@@ -1143,7 +1149,13 @@ async function startScanner(){
 
       },
 
-      function(){}
+      function(errorMessage){
+
+        // Jangan tampilkan error scanning terus-menerus.
+        // html5-qrcode memang mengirim banyak callback
+        // ketika QR belum tepat berada di frame.
+
+      }
 
     );
 
@@ -1174,9 +1186,12 @@ async function startScanner(){
 
     show(
 
-      "<b>Kamera tidak dapat diaktifkan.</b><br><br>" +
+      "<b>Kamera tidak dapat diaktifkan.</b>" +
+      "<br><br>" +
 
       "Pastikan izin kamera diberikan. " +
+
+      "<br><br>" +
 
       "Jika tetap gagal, gunakan " +
       "input BIB manual.",
@@ -1190,9 +1205,9 @@ async function startScanner(){
 }
 
 
-/* =========================================================
-   BUTTON CAMERA
-========================================================= */
+// =========================================================
+// CAMERA BUTTON
+// =========================================================
 
 document
   .getElementById(
@@ -1204,9 +1219,9 @@ document
   );
 
 
-/* =========================================================
-   BUTTON MANUAL
-========================================================= */
+// =========================================================
+// MANUAL BUTTON
+// =========================================================
 
 document
   .getElementById(
@@ -1240,9 +1255,17 @@ document
 
         show(
 
-          "Format BIB tidak valid.<br><br>" +
+          "<div class='big'>" +
+          "✕ CHECK-IN GAGAL" +
+          "</div>" +
 
-          "Format yang diterima:<br>" +
+          "Format BIB tidak valid." +
+
+          "<br><br>" +
+
+          "Format yang diterima:" +
+
+          "<br><br>" +
 
           "<b>M26001</b> / " +
           "<b>F26001</b> / " +
@@ -1278,9 +1301,9 @@ document
   );
 
 
-/* =========================================================
-   ENTER
-========================================================= */
+// =========================================================
+// ENTER
+// =========================================================
 
 document
   .getElementById(
@@ -1291,8 +1314,7 @@ document
     function(e){
 
       if(
-        e.key ===
-        "Enter"
+        e.key === "Enter"
       ){
 
         document
@@ -1307,12 +1329,16 @@ document
   );
 
 
-/* =========================================================
-   INITIAL LOAD
-========================================================= */
+// =========================================================
+// INITIAL LOAD
+// =========================================================
 
 loadStats();
 
+
+// =========================================================
+// AUTO REFRESH STATISTICS
+// =========================================================
 
 statsTimer =
   setInterval(
