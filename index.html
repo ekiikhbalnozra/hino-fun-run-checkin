@@ -17,6 +17,11 @@
 
 <title>Hino Fun Run 2026 - Check-in</title>
 
+<script
+  src="https://unpkg.com/html5-qrcode"
+  defer>
+</script>
+
 <style>
 
 *{
@@ -64,6 +69,21 @@ h1{
   padding:12px 6px;
   border-radius:12px;
   text-align:center;
+  background:#f3f4f6;
+}
+
+.stat-number{
+  font-size:24px;
+  font-weight:800;
+  line-height:1.1;
+  min-height:27px;
+}
+
+.stat-label{
+  margin-top:5px;
+  font-size:11px;
+  color:#6b7280;
+  font-weight:700;
 }
 
 .stat.total{
@@ -80,19 +100,6 @@ h1{
   color:#92400e;
 }
 
-.stat-number{
-  font-size:24px;
-  font-weight:800;
-  line-height:1.1;
-}
-
-.stat-label{
-  margin-top:5px;
-  font-size:11px;
-  color:#6b7280;
-  font-weight:700;
-}
-
 .refresh-info{
   text-align:center;
   font-size:11px;
@@ -107,6 +114,7 @@ h1{
   overflow:hidden;
   border-radius:14px;
   border:2px solid #ddd;
+  background:#111;
 }
 
 #reader video{
@@ -184,8 +192,11 @@ small{
   margin-bottom:8px;
 }
 
-.loading{
-  opacity:.7;
+.camera-status{
+  text-align:center;
+  font-size:13px;
+  color:#6b7280;
+  margin-top:8px;
 }
 
 </style>
@@ -199,7 +210,10 @@ small{
 
 <div class="card">
 
-<h1>Hino Fun Run 2026</h1>
+
+<h1>
+Hino Fun Run 2026
+</h1>
 
 <div class="sub">
 CHECK-IN PESERTA — QR SCANNER
@@ -207,7 +221,7 @@ CHECK-IN PESERTA — QR SCANNER
 
 
 <!-- =====================================================
-     STATISTICS
+     STATISTIK
 ===================================================== -->
 
 <div class="stats">
@@ -216,8 +230,9 @@ CHECK-IN PESERTA — QR SCANNER
 
 <div
   class="stat-number"
-  id="totalPeserta"
->-</div>
+  id="totalPeserta">
+-
+</div>
 
 <div class="stat-label">
 TOTAL PESERTA
@@ -230,8 +245,9 @@ TOTAL PESERTA
 
 <div
   class="stat-number"
-  id="totalHadir"
->-</div>
+  id="totalHadir">
+-
+</div>
 
 <div class="stat-label">
 SUDAH CHECK-IN
@@ -244,8 +260,9 @@ SUDAH CHECK-IN
 
 <div
   class="stat-number"
-  id="totalBelum"
->-</div>
+  id="totalBelum">
+-
+</div>
 
 <div class="stat-label">
 BELUM CHECK-IN
@@ -258,8 +275,7 @@ BELUM CHECK-IN
 
 <div
   class="refresh-info"
-  id="refreshInfo"
->
+  id="refreshInfo">
 Memuat statistik...
 </div>
 
@@ -270,18 +286,33 @@ Memuat statistik...
 
 <div id="reader"></div>
 
+<div
+  class="camera-status"
+  id="cameraStatus">
+Kamera belum aktif.
+</div>
+
+
 <button id="startBtn">
 AKTIFKAN KAMERA
 </button>
 
 
+<!-- =====================================================
+     HASIL
+===================================================== -->
+
 <div
   id="result"
-  class="result"
->
-Siap. Tekan
+  class="result">
+
+Siap.
+
+Tekan
 <b>AKTIFKAN KAMERA</b>,
-izinkan kamera, lalu arahkan ke QR BIB.
+izinkan kamera,
+lalu arahkan ke QR pada BIB.
+
 </div>
 
 
@@ -291,7 +322,10 @@ izinkan kamera, lalu arahkan ke QR BIB.
 
 <div class="manual">
 
-<b>Backup: input BIB manual</b>
+<b>
+Backup: input BIB manual
+</b>
+
 
 <input
   id="manualBib"
@@ -300,47 +334,47 @@ izinkan kamera, lalu arahkan ke QR BIB.
   maxlength="6"
 >
 
+
 <button id="manualBtn">
 CHECK-IN MANUAL
 </button>
 
+
 <small>
 
-Format BIB yang didukung:
+<b>Format BIB yang didukung:</b>
 
-<b>M / F / H / S / P / I</b>
+<br>
+
+M / F / H / S / P / I + 5 digit
 
 <br><br>
 
 Contoh:
 
-M26001, F26001, H26037,
-S26018, P26023, I26020.
+<br>
+
+M26001, F26001, H26001,
+S26001, P26001, I26001
 
 <br><br>
 
 QR maupun BIB manual diproses
-tanpa meninggalkan halaman web check-in.
+tanpa meninggalkan halaman
+web check-in.
 
 </small>
 
 </div>
 
-</div>
 
 </div>
 
-
-<!-- =====================================================
-     QR SCANNER LIBRARY
-===================================================== -->
-
-<script
-  src="https://unpkg.com/html5-qrcode"
-></script>
+</div>
 
 
 <script>
+
 
 /* =========================================================
    CONFIG
@@ -350,6 +384,10 @@ const APP_URL =
   "https://script.google.com/macros/s/AKfycbzAhqm744ZPESuxOcTzybAFfnLlU_r7Y6b2VOvogkoGTEiyO2B5an1bZ5AQW0_UsxGz/exec";
 
 
+/* =========================================================
+   GLOBAL
+========================================================= */
+
 let scanner = null;
 
 let locked = false;
@@ -358,7 +396,7 @@ let statsTimer = null;
 
 
 /* =========================================================
-   FORMAT NUMBER
+   FORMAT ANGKA
 ========================================================= */
 
 function formatNumber(value){
@@ -375,7 +413,7 @@ function formatNumber(value){
 
 function esc(value){
 
-  return String(value || "")
+  return String(value == null ? "" : value)
     .replace(
       /[&<>"']/g,
       function(m){
@@ -400,13 +438,13 @@ function esc(value){
    SHOW RESULT
 ========================================================= */
 
-function show(message, cls=""){
+function show(message, cls){
 
   const el =
     document.getElementById("result");
 
   el.className =
-    "result " + cls;
+    "result " + (cls || "");
 
   el.innerHTML =
     message;
@@ -497,12 +535,8 @@ function jsonp(url){
       function cleanup(){
 
         try{
-          delete window[
-            callbackName
-          ];
-        }
-        catch(e){}
-
+          delete window[callbackName];
+        }catch(e){}
 
         if(
           script.parentNode
@@ -516,9 +550,7 @@ function jsonp(url){
       }
 
 
-      window[
-        callbackName
-      ] =
+      window[callbackName] =
         function(data){
 
           if(finished)
@@ -577,19 +609,18 @@ function jsonp(url){
       setTimeout(
         function(){
 
-          if(!finished){
+          if(finished)
+            return;
 
-            finished = true;
+          finished = true;
 
-            cleanup();
+          cleanup();
 
-            reject(
-              new Error(
-                "Server tidak merespons."
-              )
-            );
-
-          }
+          reject(
+            new Error(
+              "Server tidak merespons."
+            )
+          );
 
         },
         15000
@@ -622,7 +653,7 @@ async function loadStats(){
   catch(error){
 
     console.error(
-      "Statistics error:",
+      "STATISTICS ERROR:",
       error
     );
 
@@ -638,22 +669,39 @@ async function loadStats(){
 
 
 /* =========================================================
-   VALIDATE BIB
+   VALIDASI BIB
 ========================================================= */
+
+/*
+
+  FORMAT:
+
+  M26001
+  F26001
+  H26001
+  S26001
+  P26001
+  I26001
+
+*/
 
 function isValidBib(bib){
 
-  return /^[MFHSPI]\d{5}$/i
-    .test(
-      String(bib || "")
-        .trim()
-    );
+  bib =
+    String(bib || "")
+      .trim()
+      .toUpperCase();
+
+
+  return /^[MFHSPI]\d{5}$/.test(
+    bib
+  );
 
 }
 
 
 /* =========================================================
-   EXTRACT BIB FROM QR
+   EXTRACT BIB DARI QR
 ========================================================= */
 
 function extractBib(text){
@@ -663,13 +711,21 @@ function extractBib(text){
       .trim();
 
 
+  if(!text)
+    return "";
+
+
   /*
-   * 1.
-   * QR langsung berisi:
+   * =======================================================
+   * 1. LANGSUNG BIB
    *
-   * H26037
+   * H26001
+   * S26001
+   * P26001
+   * I26001
    * M26001
    * F26001
+   * =======================================================
    */
 
   if(
@@ -683,12 +739,13 @@ function extractBib(text){
 
 
   /*
-   * 2.
-   * QR berisi URL:
+   * =======================================================
+   * 2. URL
    *
-   * ?b=H26037
+   * https://....?b=H26001
    *
-   * ?bib=H26037
+   * https://....?bib=H26001
+   * =======================================================
    */
 
   try{
@@ -697,37 +754,103 @@ function extractBib(text){
       new URL(text);
 
 
+    const b =
+      url.searchParams.get("b");
+
+
     const bib =
-      url.searchParams.get("b") ||
       url.searchParams.get("bib");
 
 
+    const value =
+      b ||
+      bib ||
+      "";
+
+
     if(
-      bib &&
-      isValidBib(bib)
+      isValidBib(value)
     ){
 
-      return bib
+      return value
         .trim()
         .toUpperCase();
 
     }
 
   }
-  catch(e){}
+  catch(error){
+
+    console.log(
+      "Bukan URL:",
+      text
+    );
+
+  }
 
 
   /*
-   * 3.
-   * BACKUP PALING ROBUST
-   *
-   * Cari pola BIB di dalam
-   * seluruh isi QR.
+   * =======================================================
+   * 3. CARI ?b=H26001
+   * =======================================================
    */
 
-  const match =
+  let match =
     text.match(
-      /(?:^|[^A-Z0-9])([MFHSPI]\d{5})(?:[^A-Z0-9]|$)/i
+      /[?&]b=([A-Za-z0-9_-]{6})/i
+    );
+
+
+  if(
+    match &&
+    isValidBib(match[1])
+  ){
+
+    return match[1]
+      .toUpperCase();
+
+  }
+
+
+  /*
+   * =======================================================
+   * 4. CARI ?bib=H26001
+   * =======================================================
+   */
+
+  match =
+    text.match(
+      /[?&]bib=([A-Za-z0-9_-]{6})/i
+    );
+
+
+  if(
+    match &&
+    isValidBib(match[1])
+  ){
+
+    return match[1]
+      .toUpperCase();
+
+  }
+
+
+  /*
+   * =======================================================
+   * 5. BACKUP:
+   * CARI POLA BIB DI DALAM TEXT
+   *
+   * Contoh:
+   *
+   * CHECKIN-H26001
+   * BIB:H26001
+   * peserta-H26001
+   * =======================================================
+   */
+
+  match =
+    text.match(
+      /\b([MFHSPI]\d{5})\b/i
     );
 
 
@@ -748,7 +871,7 @@ function extractBib(text){
 
 
 /* =========================================================
-   PROCESS CHECK-IN
+   PROSES CHECK-IN
 ========================================================= */
 
 async function processCheckin(
@@ -762,19 +885,82 @@ async function processCheckin(
       .toUpperCase();
 
 
-  if(!bib)
+  /*
+   * VALIDASI CLIENT
+   */
+
+  if(
+    !isValidBib(bib)
+  ){
+
+    show(
+
+      "<div class='big'>" +
+      "✕ CHECK-IN GAGAL" +
+      "</div>" +
+
+      "<div>" +
+
+      "Format BIB tidak valid." +
+
+      "<br><br>" +
+
+      "Format yang didukung:" +
+
+      "<br>" +
+
+      "<b>M / F / H / S / P / I + 5 digit</b>" +
+
+      "<br><br>" +
+
+      "Contoh: " +
+
+      "<b>M26001</b>, " +
+      "<b>F26001</b>, " +
+      "<b>H26001</b>, " +
+      "<b>S26001</b>, " +
+      "<b>P26001</b>, " +
+      "<b>I26001</b>" +
+
+      "</div>",
+
+      "err"
+
+    );
+
+    locked = false;
+
     return;
 
-
-  show(
-    "Memproses BIB <b>" +
-    esc(bib) +
-    "</b>...",
-    ""
-  );
+  }
 
 
   try{
+
+    show(
+
+      "<div class='big'>" +
+      "MEMPROSES..." +
+      "</div>" +
+
+      "<div>" +
+      "BIB: <b>" +
+      esc(bib) +
+      "</b>" +
+      "</div>",
+
+      ""
+
+    );
+
+
+    /*
+     * =====================================================
+     * KIRIM KE GOOGLE APPS SCRIPT
+     *
+     * TETAP DI HALAMAN GITHUB
+     * =====================================================
+     */
 
     const url =
       APP_URL +
@@ -797,9 +983,11 @@ async function processCheckin(
     );
 
 
-    /* =====================================================
-       SUCCESS
-    ===================================================== */
+    /*
+     * =====================================================
+     * SUCCESS
+     * =====================================================
+     */
 
     if(
       data &&
@@ -812,23 +1000,28 @@ async function processCheckin(
         "✓ CHECK-IN BERHASIL" +
         "</div>" +
 
-        "<div><b>BIB:</b> " +
+        "<div>" +
+        "<b>BIB:</b> " +
         esc(data.bib) +
         "</div>" +
 
-        "<div><b>Nama:</b> " +
+        "<div>" +
+        "<b>Nama:</b> " +
         esc(data.name) +
         "</div>" +
 
-        "<div><b>Gender:</b> " +
+        "<div>" +
+        "<b>Gender:</b> " +
         esc(data.gender) +
         "</div>" +
 
-        "<div><b>Size:</b> " +
+        "<div>" +
+        "<b>Size:</b> " +
         esc(data.size) +
         "</div>" +
 
-        "<div><b>Waktu:</b> " +
+        "<div>" +
+        "<b>Waktu:</b> " +
         esc(data.time) +
         "</div>",
 
@@ -837,8 +1030,16 @@ async function processCheckin(
       );
 
 
-      await loadStats();
+      /*
+       * UPDATE STATISTIK
+       */
 
+      loadStats();
+
+
+      /*
+       * SIAP SCAN BERIKUTNYA
+       */
 
       setTimeout(
         function(){
@@ -846,13 +1047,16 @@ async function processCheckin(
           locked = false;
 
           show(
+
             "Kamera aktif. " +
             "Silakan scan BIB berikutnya.",
+
             ""
+
           );
 
         },
-        2000
+        2500
       );
 
 
@@ -861,9 +1065,11 @@ async function processCheckin(
     }
 
 
-    /* =====================================================
-       DUPLICATE
-    ===================================================== */
+    /*
+     * =====================================================
+     * DUPLICATE
+     * =====================================================
+     */
 
     if(
       data &&
@@ -876,23 +1082,28 @@ async function processCheckin(
         "⚠ SUDAH CHECK-IN" +
         "</div>" +
 
-        "<div><b>BIB:</b> " +
+        "<div>" +
+        "<b>BIB:</b> " +
         esc(data.bib) +
         "</div>" +
 
-        "<div><b>Nama:</b> " +
+        "<div>" +
+        "<b>Nama:</b> " +
         esc(data.name) +
         "</div>" +
 
-        "<div><b>Gender:</b> " +
+        "<div>" +
+        "<b>Gender:</b> " +
         esc(data.gender) +
         "</div>" +
 
-        "<div><b>Size:</b> " +
+        "<div>" +
+        "<b>Size:</b> " +
         esc(data.size) +
         "</div>" +
 
-        "<div>Waktu sebelumnya: " +
+        "<div>" +
+        "Waktu sebelumnya: " +
         esc(data.previousTime) +
         "</div>",
 
@@ -901,7 +1112,7 @@ async function processCheckin(
       );
 
 
-      await loadStats();
+      loadStats();
 
 
       setTimeout(
@@ -910,13 +1121,16 @@ async function processCheckin(
           locked = false;
 
           show(
+
             "Kamera aktif. " +
             "Silakan scan BIB berikutnya.",
+
             ""
+
           );
 
         },
-        2000
+        2500
       );
 
 
@@ -925,9 +1139,11 @@ async function processCheckin(
     }
 
 
-    /* =====================================================
-       NOT FOUND / INVALID / ERROR
-    ===================================================== */
+    /*
+     * =====================================================
+     * NOT FOUND / ERROR
+     * =====================================================
+     */
 
     show(
 
@@ -937,9 +1153,10 @@ async function processCheckin(
 
       "<div>" +
       esc(
-        data && data.message
+        data &&
+        data.message
           ? data.message
-          : "BIB tidak dapat diproses."
+          : "Terjadi kesalahan."
       ) +
       "</div>",
 
@@ -950,11 +1167,12 @@ async function processCheckin(
 
     locked = false;
 
+
   }
   catch(error){
 
     console.error(
-      "Check-in error:",
+      "CHECK-IN ERROR:",
       error
     );
 
@@ -966,7 +1184,10 @@ async function processCheckin(
       "</div>" +
 
       "<div>" +
-      esc(error.message) +
+      esc(
+        error.message ||
+        "Gagal menghubungi server."
+      ) +
       "</div>",
 
       "err"
@@ -987,8 +1208,11 @@ async function processCheckin(
 
 async function startScanner(){
 
-  if(scanner)
+  if(scanner){
+
     return;
+
+  }
 
 
   if(
@@ -997,9 +1221,17 @@ async function startScanner(){
   ){
 
     show(
-      "Scanner belum siap. " +
-      "Refresh halaman lalu coba lagi.",
+
+      "<div class='big'>" +
+      "SCANNER BELUM SIAP" +
+      "</div>" +
+
+      "<div>" +
+      "Tunggu beberapa detik lalu coba lagi."
+      + "</div>",
+
       "err"
+
     );
 
     return;
@@ -1014,6 +1246,12 @@ async function startScanner(){
 
 
   reader.innerHTML = "";
+
+
+  document.getElementById(
+    "cameraStatus"
+  ).textContent =
+    "Mengaktifkan kamera...";
 
 
   scanner =
@@ -1031,7 +1269,9 @@ async function startScanner(){
       height:260
     },
 
-    aspectRatio:1.0
+    aspectRatio:1.0,
+
+    rememberLastUsedCamera:true
 
   };
 
@@ -1041,17 +1281,22 @@ async function startScanner(){
     await scanner.start(
 
       {
-        facingMode:
-          "environment"
+        facingMode:"environment"
       },
 
       config,
 
-
       function(decodedText){
 
-        if(locked)
+        /*
+         * Jangan proses QR berkali-kali
+         */
+
+        if(locked){
+
           return;
+
+        }
 
 
         console.log(
@@ -1060,52 +1305,72 @@ async function startScanner(){
         );
 
 
+        /*
+         * AMBIL BIB
+         */
+
         const bib =
           extractBib(
             decodedText
           );
 
 
-        if(!bib){
+        /*
+         * QR VALID
+         */
 
-          show(
+        if(bib){
 
-            "<div class='big'>" +
-            "⚠ QR TERBACA" +
-            "</div>" +
+          locked = true;
 
-            "<div>" +
-            "QR berhasil dibaca, tetapi " +
-            "BIB tidak ditemukan di dalam QR." +
-            "</div>" +
 
-            "<div style='margin-top:8px;font-size:13px'>" +
-            esc(decodedText) +
-            "</div>",
-
-            "warn"
-
+          processCheckin(
+            bib,
+            "QR-CAMERA"
           );
+
 
           return;
 
         }
 
 
-        locked = true;
+        /*
+         * QR TIDAK VALID
+         */
 
+        show(
 
-        processCheckin(
-          bib,
-          "QR-CAMERA"
+          "<div class='big'>" +
+          "⚠ QR TERBACA" +
+          "</div>" +
+
+          "<div>" +
+
+          "QR berhasil dibaca, " +
+          "tetapi BIB tidak ditemukan." +
+
+          "<br><br>" +
+
+          "<b>Isi QR:</b>" +
+
+          "<br>" +
+
+          esc(decodedText) +
+
+          "</div>",
+
+          "warn"
+
         );
 
       },
 
-
       function(errorMessage){
 
-        /* Ignore scanning frame errors */
+        /*
+         * Abaikan pesan scan sementara.
+         */
 
       }
 
@@ -1118,17 +1383,26 @@ async function startScanner(){
       "none";
 
 
+    document.getElementById(
+      "cameraStatus"
+    ).textContent =
+      "Kamera aktif — arahkan ke QR BIB.";
+
+
     show(
+
       "Kamera aktif. " +
-      "Arahkan ke QR pada BIB.",
+      "Arahkan kotak scanner ke QR pada BIB.",
+
       ""
+
     );
 
   }
   catch(error){
 
     console.error(
-      "Camera error:",
+      "CAMERA ERROR:",
       error
     );
 
@@ -1136,15 +1410,29 @@ async function startScanner(){
     scanner = null;
 
 
+    document.getElementById(
+      "cameraStatus"
+    ).textContent =
+      "Kamera gagal diaktifkan.";
+
+
     show(
 
-      "<b>Kamera tidak dapat diaktifkan.</b>" +
+      "<div class='big'>" +
+      "✕ KAMERA GAGAL" +
+      "</div>" +
+
+      "<div>" +
+
+      "Pastikan izin kamera diberikan " +
+      "kepada browser." +
+
       "<br><br>" +
 
-      "Pastikan izin kamera diberikan. " +
-
       "Jika tetap gagal, gunakan " +
-      "input BIB manual.",
+      "<b>CHECK-IN MANUAL</b>."
+
+      + "</div>",
 
       "err"
 
@@ -1156,7 +1444,7 @@ async function startScanner(){
 
 
 /* =========================================================
-   CAMERA BUTTON
+   BUTTON CAMERA
 ========================================================= */
 
 document
@@ -1168,7 +1456,7 @@ document
 
 
 /* =========================================================
-   MANUAL CHECK-IN
+   BUTTON MANUAL
 ========================================================= */
 
 document
@@ -1177,8 +1465,11 @@ document
     "click",
     function(){
 
-      if(locked)
+      if(locked){
+
         return;
+
+      }
 
 
       const input =
@@ -1193,6 +1484,10 @@ document
           .toUpperCase();
 
 
+      /*
+       * VALIDASI
+       */
+
       if(
         !isValidBib(bib)
       ){
@@ -1200,20 +1495,22 @@ document
         show(
 
           "<div class='big'>" +
-          "✕ FORMAT BIB SALAH" +
+          "✕ FORMAT BIB TIDAK VALID" +
           "</div>" +
 
           "<div>" +
-          "Format yang diterima:" +
-          "</div>" +
 
-          "<div style='margin-top:8px'>" +
+          "Gunakan format:" +
+
+          "<br><br>" +
+
           "<b>M26001</b> / " +
           "<b>F26001</b> / " +
           "<b>H26001</b> / " +
           "<b>S26001</b> / " +
           "<b>P26001</b> / " +
           "<b>I26001</b>" +
+
           "</div>",
 
           "warn"
@@ -1244,7 +1541,7 @@ document
 
 
 /* =========================================================
-   ENTER KEY
+   ENTER MANUAL
 ========================================================= */
 
 document
@@ -1281,6 +1578,7 @@ statsTimer =
     loadStats,
     5000
   );
+
 
 </script>
 
